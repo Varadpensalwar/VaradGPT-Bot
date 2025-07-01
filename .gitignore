@@ -1,0 +1,51 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+*.log
+
+# Virtual environment
+venv/
+env/
+.varadgptbot/
+varadgptbot/
+varadgptbot/Lib/
+varadgptbot/Scripts/
+varadgptbot/include/
+varadgptbot/pyvenv.cfg
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Environment and secrets
+.env
+.env.*
+*.env
+*.env.*
+varadgpt-bot.json
+*.json
+
+token.json
+credentials.json
+gmail-credentials.json
+gmail_tokens.json
+
+# User data
+user_timezones.json
+user_cities.json
+birthdays.json
+
+# Misc
+*.bak
+*.swp
+*.tmp 

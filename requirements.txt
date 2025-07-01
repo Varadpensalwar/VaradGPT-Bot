@@ -1,0 +1,7 @@
+aiogram
+openai==0.28
+python-dotenv
+pytz
+timezonefinder
+geopy
+Babel
