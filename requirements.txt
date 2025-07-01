@@ -13,4 +13,3 @@ google-auth-oauthlib
 aiohttp
 pydub
 requests
-python-3.12.3 
