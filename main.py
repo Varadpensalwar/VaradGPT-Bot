@@ -6,9 +6,6 @@ import sys
 import asyncio
 from aiogram.filters import Command
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, BotCommand, InputFile, FSInputFile
-import gspread
-from google.oauth2.service_account import Credentials as SACredentials
-from datetime import datetime
 import aiohttp
 from gtts import gTTS
 from pydub import AudioSegment
@@ -20,6 +17,7 @@ from aiohttp import web
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.storage.memory import MemoryStorage
+from datetime import datetime
 
 load_dotenv()
 openai.api_key = os.getenv("OpenAI_API_KEY")
@@ -58,58 +56,6 @@ def clear_past():
 
 
 
-# Language dictionaries
-LANGUAGES = {
-    'en': {
-        'welcome': "Hi\nI am VaradGPT Bot! Created by Varad Pensalwar. How can I assist you?",
-        'help': """
-Hi There, I'm VaradGPT Bot created by Varad Pensalwar! Please follow these commands - 
-/start - to start the conversation
-/clear - to clear the past conversation and context.
-/help - to get this help menu.
-/language - to change language.
-I hope this helps. :)
-""",
-        'cleared': "I've cleared the past conversation and context.",
-        'choose_language': "Please choose your language:",
-        'language_set': "Language set to English.",
-        'about': """
-🤖 *VaradGPT Bot*\nCreated by Varad Pensalwar\nPowered by OpenAI GPT\nLanguages: English, Hindi, Marathi\nSource: [GitHub](https://github.com/VaradPensalwar)\n""",
-    },
-    'hi': {
-        'welcome': "नमस्ते\nमैं वरदजीपीटी बोट हूँ! वरद पेंसालवार द्वारा निर्मित। मैं आपकी कैसे सहायता कर सकता हूँ?",
-        'help': """
-नमस्ते, मैं वरद पेंसालवार द्वारा बनाया गया वरदजीपीटी बोट हूँ! कृपया ये कमांड्स आज़माएँ - 
-/start - बातचीत शुरू करने के लिए
-/clear - पिछली बातचीत और संदर्भ साफ़ करने के लिए
-/help - यह सहायता मेनू पाने के लिए
-/language - भाषा बदलने के लिए
-आशा है यह मदद करेगा :)
-""",
-        'cleared': "मैंने पिछली बातचीत और संदर्भ साफ़ कर दिया है।",
-        'choose_language': "कृपया अपनी भाषा चुनें:",
-        'language_set': "भाषा हिंदी पर सेट की गई है।",
-        'about': """
-🤖 *वरदजीपीटी बोट*\nनिर्माता: वरद पेंसालवार\nOpenAI GPT द्वारा संचालित\nभाषाएँ: अंग्रे़ी, हिंदी, मराठी\nस्रोत: [GitHub](https://github.com/VaradPensalwar)\n""",
-    },
-    'mr': {
-        'welcome': "नमस्कार\nमी वरदजीपीटी बोट आहे! वरद पेंसालवार यांनी तयार केले आहे. मी तुम्हाला कशी मदत करू शकतो?",
-        'help': """
-नमस्कार, मी वरद पेंसालवार यांनी तयार केलेला वरदजीपीटी बोट आहे! कृपया हे कमांड्स वापरा - 
-/start - संभाषण सुरू करण्यासाठी
-/clear - मागील संभाषण आणि संदर्भ साफ करण्यासाठी
-/help - ही मदत मेनू मिळवण्यासाठी
-/language - भाषा बदलण्यासाठी
-आशा आहे हे उपयुक्त ठरेल :)
-""",
-        'cleared': "मी मागील संभाषण आणि संदर्भ साफ केले आहेत.",
-        'choose_language': "कृपया आपली भाषा निवडा:",
-        'language_set': "भाषा मराठीवर सेट केली आहे.",
-        'about': """
-🤖 *वरदजीपीटी बोट*\nनिर्माता: वरद पेंसालवार\nOpenAI GPT द्वारे समर्थित\nभाषा: इंग्रजी, हिंदी, मराठी\nस्रोत: [GitHub](https://github.com/VaradPensalwar)\n""",
-    }
-}
-
 # In-memory user language store
 user_languages = {}
 
@@ -125,38 +71,6 @@ def get_lang(user_id):
         return 'en'
     return user_languages.get(user_id, 'en')
 
-# /language command handler
-@router.message(Command("language"))
-async def language_command(message: types.Message):
-    user_id = safe_user_id(message)
-    if user_id is None:
-        await message.reply("User not found.")
-        return
-    kb = ReplyKeyboardMarkup(
-        keyboard=[
-            [KeyboardButton(text="English")],
-            [KeyboardButton(text="हिंदी")],
-            [KeyboardButton(text="मराठी")],
-        ],
-        resize_keyboard=True
-    )
-    lang = get_lang(user_id)
-    await message.reply(LANGUAGES[lang]['choose_language'], reply_markup=kb)
-
-# Language selection handler
-@router.message(lambda m: m.text in ["English", "हिंदी", "मराठी"])
-async def set_language(message: types.Message):
-    user_id = safe_user_id(message)
-    if user_id is None:
-        await message.reply("User not found.")
-        return
-    lang_map = {"English": "en", "हिंदी": "hi", "मराठी": "mr"}
-    user_text = message.text if isinstance(message.text, str) else "English"
-    if user_text not in lang_map:
-        user_text = "English"
-    user_languages[user_id] = lang_map[user_text]
-    await message.reply(LANGUAGES[lang_map[user_text]]['language_set'], reply_markup=types.ReplyKeyboardRemove())
-
 # Update all other handlers to use the selected language
 @router.message(Command("clear"))
 async def clear(message: types.Message):
@@ -165,10 +79,7 @@ async def clear(message: types.Message):
         await message.reply("User not found.")
         return
     clear_past()
-    lang = get_lang(user_id)
-    if lang not in LANGUAGES:
-        lang = 'en'
-    await message.reply(LANGUAGES[lang]['cleared'])
+    await message.reply("I've cleared the past conversation and context.")
 
 def get_timezone_from_lang_code(lang_code):
     # Map common language codes to timezones
@@ -267,9 +178,6 @@ async def welcome(message: types.Message):
     if user_id is None:
         await message.reply("User not found.")
         return
-    lang = get_lang(user_id)
-    if lang not in LANGUAGES:
-        lang = 'en'
     user = getattr(message, 'from_user', None)
     first_name = getattr(user, 'first_name', 'there')
     last_name = getattr(user, 'last_name', '')
@@ -312,10 +220,13 @@ async def helper(message: types.Message):
     if user_id is None:
         await message.reply("User not found.")
         return
-    lang = get_lang(user_id)
-    if lang not in LANGUAGES:
-        lang = 'en'
-    await message.reply(LANGUAGES[lang]['help'])
+    await message.reply("""
+Hi There, I'm VaradGPT Bot created by Varad Pensalwar! Please follow these commands - 
+/start - to start the conversation
+/clear - to clear the past conversation and context.
+/help - to get this help menu.
+I hope this helps. :)
+""")
 
 @router.message(Command("about"))
 async def about(message: types.Message):
@@ -323,57 +234,9 @@ async def about(message: types.Message):
     if user_id is None:
         await message.reply("User not found.")
         return
-    lang = get_lang(user_id)
-    if lang not in LANGUAGES:
-        lang = 'en'
-    await message.reply(LANGUAGES[lang]['about'], parse_mode="Markdown")
-
-@router.message(Command("feedback"))
-async def feedback_command(message: types.Message):
-    user_id = safe_user_id(message)
-    if user_id is None:
-        await message.reply("User not found.")
-        return
-    lang = get_lang(user_id)
-    if lang not in LANGUAGES:
-        lang = 'en'
-    awaiting_feedback.add(user_id)
-    await message.reply(LANGUAGES[lang]['feedback_prompt'])
-
-# Google Sheets setup
-SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
-SERVICE_ACCOUNT_FILE = 'varadgpt-bot.json'
-SPREADSHEET_ID = '1hBvCg8xMtOgTG84_dbRqVpa8cdrDeX6Tvffal2TGCe4'
-
-# The following is for Google Sheets service account only (not related to Gmail user OAuth)
-creds = SACredentials.from_service_account_file(
-    SERVICE_ACCOUNT_FILE, scopes=SCOPES)  # type: ignore
-gs_client = gspread.authorize(creds)
-gs_sheet = gs_client.open_by_key(SPREADSHEET_ID).sheet1
-
-# Update feedback handler to log to Google Sheets
-@router.message(lambda m: safe_user_id(m) in awaiting_feedback)
-async def handle_feedback(message: types.Message):
-    user_id = safe_user_id(message)
-    if user_id is None:
-        await message.reply("User not found.")
-        return
-    lang = get_lang(user_id)
-    if lang not in LANGUAGES:
-        lang = 'en'
-    try:
-        await bot.send_message(chat_id=ADMIN_USER_ID, text=f"Feedback from {safe_full_name(message)} (id: {user_id}):\n{message.text}")
-        # Log feedback to Google Sheets
-        gs_sheet.append_row([
-            str(user_id),
-            str(safe_full_name(message)),
-            str(message.text),
-            datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        ])
-    except Exception as e:
-        print(f"Failed to send feedback: {e}")
-    awaiting_feedback.remove(user_id)
-    await message.reply(LANGUAGES[lang]['feedback_thanks'])
+    await message.reply("""
+🤖 *VaradGPT Bot*\nCreated by Varad Pensalwar\nPowered by OpenAI GPT\nLanguages: English\nSource: [GitHub](https://github.com/VaradPensalwar)
+""", parse_mode="Markdown")
 
 @router.message(lambda m: m.voice is not None)
 async def handle_voice(message: types.Message):
@@ -381,9 +244,6 @@ async def handle_voice(message: types.Message):
     if user_id is None:
         await message.reply("User not found.")
         return
-    lang = get_lang(user_id)
-    if lang not in LANGUAGES:
-        lang = 'en'
     file_id = getattr(getattr(message, 'voice', None), 'file_id', None)
     if not file_id:
         await message.reply("Voice file not found.")
@@ -432,53 +292,11 @@ async def handle_voice(message: types.Message):
             return
     except Exception as e:
         await message.reply("Sorry, I couldn't get a response from ChatGPT.")
+        print(f"OpenAI error: {e}")
         return
     reference.response = chatgpt_reply
     print(f">>> chatGPT: \n\t{reference.response}")
     await bot.send_message(chat_id = message.chat.id, text = reference.response)
-
-# Update admin/group chat ID for feedback
-ADMIN_USER_ID = -4842086049  # Feedback will be sent to this group
-
-# Track users waiting to send feedback
-awaiting_feedback = set()
-
-# Add feedback prompts to LANGUAGES
-def add_feedback_langs():
-    LANGUAGES['en']['feedback_prompt'] = "Please type your feedback and send it."
-    LANGUAGES['en']['feedback_thanks'] = "Thank you for your feedback!"
-    LANGUAGES['hi']['feedback_prompt'] = "कृपया अपनी प्रतिक्रिया लिखें और भेजें।"
-    LANGUAGES['hi']['feedback_thanks'] = "आपकी प्रतिक्रिया के लिए धन्यवाद!"
-    LANGUAGES['mr']['feedback_prompt'] = "कृपया आपली प्रतिक्रिया लिहा आणि पाठवा."
-    LANGUAGES['mr']['feedback_thanks'] = "आपल्या प्रतिक्रियेबद्दल धन्यवाद!"
-add_feedback_langs()
-
-# Add group info command to LANGUAGES
-def add_groupinfo_langs():
-    LANGUAGES['en']['groupinfo'] = "This command shows info about the group."
-    LANGUAGES['hi']['groupinfo'] = "यह कमांड ग्रुप की जानकारी दिखाता है।"
-    LANGUAGES['mr']['groupinfo'] = "ही कमांड ग्रुपची माहिती दर्शवते."
-add_groupinfo_langs()
-
-@router.message(Command("groupinfo"))
-async def groupinfo(message: types.Message):
-    user_id = safe_user_id(message)
-    if user_id is None:
-        await message.reply("User not found.")
-        return
-    lang = get_lang(user_id)
-    if lang not in LANGUAGES:
-        lang = 'en'
-    if getattr(message.chat, 'type', None) in ["group", "supergroup"]:
-        info = f"Group Name: {getattr(message.chat, 'title', 'Unknown')}\nGroup ID: {getattr(message.chat, 'id', 'Unknown')}"
-        try:
-            count = await bot.get_chat_member_count(message.chat.id)
-            info += f"\nMembers: {count}"
-        except Exception:
-            pass
-        await message.reply(info)
-    else:
-        await message.reply(LANGUAGES[lang]['groupinfo'])
 
 # --- User timezone storage ---
 USER_TZ_FILE = 'user_timezones.json'
@@ -718,6 +536,7 @@ async def chatgpt(message: types.Message):
             return
     except Exception as e:
         await message.reply("Sorry, I couldn't get a response from ChatGPT.")
+        print(f"OpenAI error: {e}")
         return
     reference.response = chatgpt_reply
     print(f">>> chatGPT: \n\t{reference.response}")
@@ -734,10 +553,7 @@ async def set_bot_commands(bot: Bot):
         BotCommand(command="start", description="Start the conversation"),
         BotCommand(command="help", description="Show help menu"),
         BotCommand(command="about", description="About VaradGPT Bot"),
-        BotCommand(command="language", description="Change language"),
         BotCommand(command="clear", description="Clear conversation/context"),
-        BotCommand(command="feedback", description="Send feedback to the creator"),
-        BotCommand(command="groupinfo", description="Group info"),
     ]
     await bot.set_my_commands(commands)
 
