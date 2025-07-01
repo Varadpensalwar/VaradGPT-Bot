@@ -6,3 +6,9 @@ timezonefinder
 geopy
 Babel
 gspread
+gtts
+pydub
+google-auth
+google-auth-oauthlib
+aiohttp
+requests
