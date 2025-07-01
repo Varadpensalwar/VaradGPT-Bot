@@ -1,135 +1,114 @@
 # VaradGPT Bot 🤖
 
-A multilingual, AI-powered Telegram bot built with Python and OpenAI GPT, featuring Google Sheets integration, timezone and city utilities, and a friendly, customizable user experience.
+A friendly, AI-powered Telegram bot built with Python and OpenAI GPT, featuring timezone and city utilities, voice message transcription, and a customizable user experience.
 
 ---
 
 ## ✨ Features
 
 - **Conversational AI**: Powered by OpenAI GPT for natural, context-aware chat.
-- **Multilingual Support**: English, Hindi, and Marathi out of the box.
-- **Google Sheets Feedback Logging**: User feedback is logged directly to a Google Sheet.
 - **Timezone & City Utilities**: Users can set their city/timezone and get local time/date info.
 - **Voice Message Transcription**: Converts Telegram voice messages to text using OpenAI Whisper.
-- **Personalization**: Remembers user language, birthday, and usage count.
-- **Group Info**: Provides group chat statistics and info.
-- **Easy Extensibility**: Modular codebase for adding new commands and features.
+- **Birthday Reminders**: Users can set and be greeted on their birthday.
+- **Festive Greetings**: Sends special greetings on holidays and festivals.
+- **English-only, clean, and privacy-friendly**: No language selection, no feedback logging, and no external data storage.
 
 ---
 
 ## 🛠️ Tech Stack
 
-- **Backend**: Python 3, [aiogram](https://docs.aiogram.dev/), [OpenAI API](https://platform.openai.com/docs/api-reference), [gspread](https://gspread.readthedocs.io/en/latest/)
-- **Utilities**: [python-dotenv](https://pypi.org/project/python-dotenv/), [pytz](https://pypi.org/project/pytz/), [timezonefinder](https://pypi.org/project/timezonefinder/), [geopy](https://geopy.readthedocs.io/en/stable/), [Babel](https://babel.pocoo.org/)
-- **Deployment**: Render, Docker, or any Python-friendly cloud/VPS
+- **Backend**: Python 3.12+
+- **Frameworks/Libraries**:
+  - [aiogram](https://docs.aiogram.dev/) (Telegram Bot API)
+  - [openai](https://github.com/openai/openai-python) (ChatGPT/Whisper)
+  - [gtts](https://pypi.org/project/gTTS/) (Text-to-Speech)
+  - [pydub](https://github.com/jiaaro/pydub) (Audio processing)
+  - [python-dotenv](https://pypi.org/project/python-dotenv/) (Env management)
+  - [pytz](https://pypi.org/project/pytz/) (Timezone support)
+  - [timezonefinder](https://pypi.org/project/timezonefinder/) (City to timezone)
+  - [geopy](https://pypi.org/project/geopy/) (Geocoding)
+  - [aiohttp](https://docs.aiohttp.org/) (Async HTTP)
 
 ---
 
 ## 📁 Project Structure
 
-```plaintext
+```text
 VaradGPT-Bot/
-├── main.py                  # Main bot application
-├── requirements.txt         # Python dependencies
-├── .gitignore               # Files/folders to ignore in git
-├── LICENSE                  # MIT License
+├── LICENSE
+├── main.py
+├── README.md
+├── requirements.txt
+├── runtime.txt
 ├── research/
-│   └── varadgpt_bot.py      # Experimental/legacy bot code
-├── varadgptbot/             # Python virtual environment (do not commit)
-│   ├── Lib/
-│   ├── Scripts/
-│   ├── Include/
-│   └── pyvenv.cfg
-└── varadgpt-bot.json        # Google service account credentials (DO NOT COMMIT)
+│   └── varadgpt_bot.py
+├── varadgptbot/
+│   └── (virtual environment files)
 ```
 
 ---
 
-## 🚦 Prerequisites
+## ⚙️ Installation & Setup
 
-- Python 3.8+
+### **Prerequisites**
+- Python 3.12+
 - Telegram account (to create a bot via [BotFather](https://core.telegram.org/bots#botfather))
-- OpenAI API key ([get one here](https://platform.openai.com/account/api-keys))
-- Google Cloud service account with Sheets API enabled ([guide](https://gspread.readthedocs.io/en/latest/oauth2.html))
-- (Optional) Render, Heroku, or VPS for deployment
+- OpenAI account & API key
 
----
+### **1. Clone the repository**
+```bash
+git clone https://github.com/Varadpensalwar/VaradGPT-Bot.git
+cd VaradGPT-Bot
+```
 
-## ⚙️ Installation
+### **2. Create and activate a virtual environment**
+```bash
+python -m venv varadgptbot
+# On Windows:
+./varadgptbot/Scripts/activate
+# On macOS/Linux:
+source varadgptbot/bin/activate
+```
 
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/Varadpensalwar/VaradGPT-Bot.git
-   cd VaradGPT-Bot
-   ```
+### **3. Install dependencies**
+```bash
+pip install -r requirements.txt
+```
 
-2. **Create and activate a virtual environment**
-   ```bash
-   python -m venv varadgptbot
-   # On Windows:
-   .\varadgptbot\Scripts\activate
-   # On macOS/Linux:
-   source varadgptbot/bin/activate
-   ```
-
-3. **Install dependencies**
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-4. **Set up environment variables**
-   - Copy `.env.example` to `.env` and fill in your secrets:
-     ```env
-     TELEGRAM_BOT_TOKEN=your-telegram-bot-token
-     OPENAI_API_KEY=your-openai-api-key
-     ```
-
-5. **Add Google service account credentials**
-   - Download your `varadgpt-bot.json` from Google Cloud and place it in the project root.
-   - **Never commit this file!**
-
----
-
-## 📝 Environment Variables
-
-Create a `.env` file in your project root:
-
+### **4. Set up environment variables**
+Create a `.env` file in the project root:
 ```env
-TELEGRAM_BOT_TOKEN=your-telegram-bot-token
 OPENAI_API_KEY=your-openai-api-key
+TELEGRAM_BOT_TOKEN=your-telegram-bot-token
 ```
 
 ---
 
 ## 🚀 Running the Bot
 
-### Development
-
+### **Development**
 ```bash
 python main.py
 ```
 
-### Production (Render/Heroku)
-
-- Set environment variables and upload `varadgpt-bot.json` as a secret file in your platform's dashboard.
-- Use the following start command:
+### **Production (Render/Railway/Other)**
+- Ensure `runtime.txt` specifies `python-3.12.3` for compatibility.
+- Set environment variables in your deployment dashboard.
+- Use the start command:
   ```bash
   python main.py
   ```
 
 ---
 
-## 🤝 Contributing
+## 📝 Contributing
 
-Contributions are welcome!  
-Please open an issue or submit a pull request for new features, bug fixes, or improvements.
-
-**How to contribute:**
+Contributions are welcome! To contribute:
 1. Fork the repo
 2. Create a new branch (`git checkout -b feature/your-feature`)
 3. Commit your changes (`git commit -am 'Add new feature'`)
-4. Push to your branch (`git push origin feature/your-feature`)
-5. Open a pull request
+4. Push to the branch (`git push origin feature/your-feature`)
+5. Open a Pull Request
 
 ---
 
@@ -139,25 +118,13 @@ This project is licensed under the [MIT License](LICENSE).
 
 ---
 
-## 💬 Contact & Support
+## 🙋‍♂️ Contact & Support
 
 - **Author:** Varad Pensalwar
 - **GitHub:** [Varadpensalwar](https://github.com/Varadpensalwar)
-- **Telegram:** [@VaradPensalwar](https://t.me/VaradPensalwar)
+- **Telegram:** [@Varadpensalwar](https://t.me/Varadpensalwar)
 - **Issues:** [GitHub Issues](https://github.com/Varadpensalwar/VaradGPT-Bot/issues)
 
 ---
 
-## 🙏 Acknowledgements
-
-- [aiogram](https://docs.aiogram.dev/)
-- [OpenAI](https://openai.com/)
-- [gspread](https://gspread.readthedocs.io/en/latest/)
-- [python-dotenv](https://pypi.org/project/python-dotenv/)
-- [timezonefinder](https://pypi.org/project/timezonefinder/)
-- [geopy](https://geopy.readthedocs.io/en/stable/)
-- [Babel](https://babel.pocoo.org/)
-
----
-
-> **Enjoy building with VaradGPT Bot! 🚀** 
+> _Happy coding and chatting with VaradGPT Bot!_ 
