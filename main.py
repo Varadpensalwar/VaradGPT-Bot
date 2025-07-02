@@ -5,7 +5,7 @@ import openai
 import sys
 import asyncio
 from aiogram.filters import Command
-from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, BotCommand, InputFile, FSInputFile
+from aiogram.types import BotCommand
 import aiohttp
 from gtts import gTTS
 import pytz
@@ -19,8 +19,9 @@ from aiogram.fsm.storage.memory import MemoryStorage
 from datetime import datetime
 
 load_dotenv()
-openai.api_key = os.getenv("OpenAI_API_KEY")
+openai.api_key = os.getenv("OPENAI_API_KEY")
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
+print("DEBUG: openai.api_key =", openai.api_key, "TELEGRAM_BOT_TOKEN =", TELEGRAM_BOT_TOKEN)
 if not openai.api_key or not TELEGRAM_BOT_TOKEN:
     raise RuntimeError("OPENAI_API_KEY and TELEGRAM_BOT_TOKEN must be set in environment variables.")
 
