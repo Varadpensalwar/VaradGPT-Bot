@@ -242,11 +242,11 @@ async def about(message: types.Message):
         "- Birthday and timezone features\n"
         "- Voice message support\n"
         "- And more!\n\n"
-        "For feedback or collaboration, contact Varad.\n\n"
+        "🔗 [Website](https://varadpensalwar.github.io/)\n"
         "🔗 [GitHub](https://github.com/Varadpensalwar)\n"
         "🔗 [LinkedIn](https://www.linkedin.com/in/varadpensalwar/)\n"
-        "🔗 [Twitter](https://twitter.com/PensalwarVarad)\n",
-        parse_mode="Markdown"
+        "🔗 [Twitter](https://twitter.com/PensalwarVarad)\n"
+        "✉️ Email: varadpensalwar@gmail.com\n"
     )
 
 @router.message(Command("project"))
@@ -442,7 +442,11 @@ async def send_resume(message: types.Message):
         "💼 *Experience*: AI/ML Engineer, Data Scientist, GenAI Specialist\n"
         "🚀 *Key Projects*: VaradGPT Bot, DocMind, BookSense, and more.\n\n"
         "For full details, see my attached resume.\n"
-        "🔗 [GitHub](https://github.com/Varadpensalwar) | [LinkedIn](https://www.linkedin.com/in/varadpensalwar/) | [Twitter](https://twitter.com/PensalwarVarad)"
+        "🔗 [Website](https://varadpensalwar.github.io/)\n"
+        "🔗 [GitHub](https://github.com/Varadpensalwar)\n"
+        "🔗 [LinkedIn](https://www.linkedin.com/in/varadpensalwar/)\n"
+        "🔗 [Twitter](https://twitter.com/PensalwarVarad)\n"
+        "✉️ Email: varadpensalwar@gmail.com\n"
     )
     await message.reply(summary, parse_mode="Markdown")
     await message.reply_document(FSInputFile('Varad Resume.pdf'), caption="📄 Varad Pensalwar – Resume")
@@ -469,11 +473,11 @@ async def send_resume_natural(message: types.Message):
 async def send_owner_info(message: types.Message):
     await message.reply(
         "Varad Pensalwar is the owner, creator, and maintainer of this bot and several other AI projects.\n\n"
-        "Connect with Varad:\n"
+        "🔗 [Website](https://varadpensalwar.github.io/)\n"
         "🔗 [GitHub](https://github.com/Varadpensalwar)\n"
         "🔗 [LinkedIn](https://www.linkedin.com/in/varadpensalwar/)\n"
-        "🔗 [Twitter](https://twitter.com/PensalwarVarad)",
-        parse_mode="Markdown"
+        "🔗 [Twitter](https://twitter.com/PensalwarVarad)\n"
+        "✉️ Email: varadpensalwar@gmail.com\n"
     )
 
 # 4. About Varad Handler (move above Q&A handler)
@@ -485,11 +489,11 @@ async def send_owner_info(message: types.Message):
 async def send_varad_info_intent(message: types.Message):
     await message.reply(
         "Varad Pensalwar is an AI/ML Engineer, Data Scientist, and GenAI Specialist from Pune, India. He is passionate about building intelligent systems that transform reality. Varad is the creator and maintainer of this bot and several other AI projects.\n\n"
-        "Connect with Varad:\n"
+        "🔗 [Website](https://varadpensalwar.github.io/)\n"
         "🔗 [GitHub](https://github.com/Varadpensalwar)\n"
         "🔗 [LinkedIn](https://www.linkedin.com/in/varadpensalwar/)\n"
-        "🔗 [Twitter](https://twitter.com/PensalwarVarad)",
-        parse_mode="Markdown"
+        "🔗 [Twitter](https://twitter.com/PensalwarVarad)\n"
+        "✉️ Email: varadpensalwar@gmail.com\n"
     )
 
 # 5. Q&A About Varad Handler (typo-tolerant, intent-based)
@@ -530,7 +534,10 @@ qa_pairs = {
     "favorite subject in school": "Math was always my favorite subject.",
     "favorite way to learn new things": "I love learning from official documentation—it's the most reliable source!",
     "favorite ai use case": "I love using AI for solving bugs and making development smoother.",
-    "favorite thing about being an ai/ml engineer": "Watching code transform raw data into intelligent insights that nobody has ever seen before is the best part of being an AI/ML engineer."
+    "favorite thing about being an ai/ml engineer": "Watching code transform raw data into intelligent insights that nobody has ever seen before is the best part of being an AI/ML engineer.",
+    "website": "🔗 [Website](https://varadpensalwar.github.io/)",
+    "portfolio": "You can explore my portfolio and learn more about me at 🔗 [Website](https://varadpensalwar.github.io/)",
+    "personal website": "My personal website is 🔗 [Website](https://varadpensalwar.github.io/)",
 }
 
 def is_varad_qa_question(m):
@@ -550,6 +557,9 @@ async def send_varad_qa(message: types.Message):
     best_q, score, _ = process.extractOne(message.text.lower(), qa_pairs.keys(), scorer=fuzz.partial_ratio)
     if score >= 80:
         answer = qa_pairs[best_q]
+        # If the question is about portfolio, website, or background, append the website link if not present
+        if best_q in ["portfolio", "website", "personal website", "background", "about", "bio"] and "varadpensalwar.github.io" not in answer:
+            answer += "\n🔗 [Website](https://varadpensalwar.github.io/)"
         await message.reply(answer)
 
 # Contact Card Handler (robust, typo-tolerant, intent-based)
@@ -575,6 +585,7 @@ def is_contact_request(m):
 async def send_contact_intent(message: types.Message):
     contact_text = (
         "Here's how you can connect with Varad Pensalwar:\n\n"
+        "🔗 [Website](https://varadpensalwar.github.io/)\n"
         "🔗 [GitHub](https://github.com/Varadpensalwar)\n"
         "🔗 [LinkedIn](https://www.linkedin.com/in/varadpensalwar/)\n"
         "🔗 [Twitter](https://twitter.com/PensalwarVarad)\n"
@@ -599,6 +610,7 @@ async def send_resume_intent(message: types.Message):
 async def send_contact(message: types.Message):
     contact_text = (
         "Here's how you can connect with Varad Pensalwar:\n\n"
+        "🔗 [Website](https://varadpensalwar.github.io/)\n"
         "🔗 [GitHub](https://github.com/Varadpensalwar)\n"
         "🔗 [LinkedIn](https://www.linkedin.com/in/varadpensalwar/)\n"
         "🔗 [Twitter](https://twitter.com/PensalwarVarad)\n"
@@ -608,6 +620,13 @@ async def send_contact(message: types.Message):
     vcard_path = "VaradPensalwar.vcf"
     if os.path.exists(vcard_path):
         await message.reply_document(FSInputFile(vcard_path), caption="📇 Varad Pensalwar – vCard")
+
+@router.message(Command("website"))
+async def send_website(message: types.Message):
+    await message.reply(
+        "🔗 Varad Pensalwar's personal website/portfolio:\n🔗 [Website](https://varadpensalwar.github.io/)",
+        parse_mode="Markdown"
+    )
 
 # Ensure the catch-all handler remains at the end
 @router.message()
@@ -646,7 +665,7 @@ async def chatgpt(message: types.Message):
     if any(kw in user_text for kw in creator_keywords):
         await message.reply(
             "I was created and maintained by Varad Pensalwar (AI/ML Engineer, Data Scientist, GenAI Specialist).\n"
-            "Connect with Varad:\n"
+            "🔗 [Website](https://varadpensalwar.github.io/)\n"
             "🔗 GitHub: https://github.com/Varadpensalwar\n"
             "🔗 LinkedIn: https://www.linkedin.com/in/varadpensalwar/\n"
             "🔗 Twitter: https://twitter.com/PensalwarVarad"
@@ -783,6 +802,7 @@ async def chatgpt(message: types.Message):
     if any(kw in user_text for kw in contact_keywords):
         await message.reply(
             "You can connect with Varad Pensalwar here:\n"
+            "🔗 [Website](https://varadpensalwar.github.io/)\n"
             "🔗 [GitHub](https://github.com/Varadpensalwar)\n"
             "🔗 [LinkedIn](https://www.linkedin.com/in/varadpensalwar/)\n"
             "🔗 [Twitter](https://twitter.com/PensalwarVarad)\n"
@@ -808,11 +828,11 @@ async def chatgpt(message: types.Message):
     if any(kw in user_text for kw in varad_keywords):
         await message.reply(
             "Varad Pensalwar is an AI/ML Engineer, Data Scientist, and GenAI Specialist from Pune, India. He is passionate about building intelligent systems that transform reality. Varad is the creator and maintainer of this bot and several other AI projects.\n\n"
-            "Connect with Varad:\n"
+            "🔗 [Website](https://varadpensalwar.github.io/)\n"
             "🔗 [GitHub](https://github.com/Varadpensalwar)\n"
             "🔗 [LinkedIn](https://www.linkedin.com/in/varadpensalwar/)\n"
-            "🔗 [Twitter](https://twitter.com/PensalwarVarad)\n",
-            parse_mode="Markdown"
+            "🔗 [Twitter](https://twitter.com/PensalwarVarad)\n"
+            "✉️ Email: varadpensalwar@gmail.com\n"
         )
         return
     # --- Resume/CV/Portfolio handler (maximally flexible) ---
@@ -831,7 +851,7 @@ async def chatgpt(message: types.Message):
             pattern = rf"{rword}(?:\W+\w+){{0,5}}\W+{cword}|{cword}(?:\W+\w+){{0,5}}\W+{rword}"
             if re.search(pattern, user_text):
                 await send_resume(message)
-                return
+        return
     prev_response = reference.response if reference.response else ""
     safe_text = message.text if isinstance(message.text, str) else ""
     if not safe_text.strip():
@@ -872,6 +892,7 @@ async def set_bot_commands(bot: Bot):
         BotCommand(command="project", description="Show Varad's featured projects"),
         BotCommand(command="resume", description="View Varad's resume (PDF)"),
         BotCommand(command="contact", description="Contact Varad (links & email)"),
+        BotCommand(command="website", description="View Varad's personal website/portfolio"),
         BotCommand(command="clear", description="Clear conversation/context"),
     ]
     await bot.set_my_commands(commands)
