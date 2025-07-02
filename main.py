@@ -5,7 +5,7 @@ import openai
 import sys
 import asyncio
 from aiogram.filters import Command
-from aiogram.types import BotCommand
+from aiogram.types import BotCommand, InputFile, FSInputFile
 import aiohttp
 from gtts import gTTS
 import pytz
@@ -240,7 +240,10 @@ async def about(message: types.Message):
         "- Birthday and timezone features\n"
         "- Voice message support\n"
         "- And more!\n\n"
-        "For feedback or collaboration, contact Varad.",
+        "For feedback or collaboration, contact Varad.\n\n"
+        "🔗 [GitHub](https://github.com/Varadpensalwar)\n"
+        "🔗 [LinkedIn](https://www.linkedin.com/in/varadpensalwar/)\n"
+        "🔗 [Twitter](https://twitter.com/PensalwarVarad)\n",
         parse_mode="Markdown"
     )
 
@@ -259,9 +262,13 @@ async def project_info(message: types.Message):
         "[GitHub](https://github.com/Varadpensalwar/BookSense) | [Demo](https://drive.google.com/file/d/1MyUsry_0wvEu-DcefOTXk-ZXc_rUrHoW/view)\n\n"
         "*VaradGPT Bot*\n"
         "VaradGPT Bot is a friendly, AI-powered Telegram bot built with Python and OpenAI GPT, offering natural conversational AI, voice message transcription, birthday reminders, and festive greetings. Designed for seamless interaction, it leverages aiogram, OpenAI APIs, and other modern Python libraries to deliver a rich chat experience.\n"
-        "[GitHub](https://github.com/Varadpensalwar/VaradGPT-Bot) | [Try on Telegram](https://web.telegram.org/k/#@VaradGPTBot)\n\n"
+        "[GitHub](https://github.com/Varadpensalwar/VaradGPT-Bot) | [Try on Telegram](https://t.me/VaradGPTBot)\n\n"
         , parse_mode="Markdown", disable_web_page_preview=True
     )
+
+@router.message(Command("projects"))
+async def projects_info(message: types.Message):
+    await project_info(message)
 
 @router.message(lambda m: m.voice is not None)
 async def handle_voice(message: types.Message):
@@ -435,6 +442,19 @@ async def chatgpt(message: types.Message):
     # Track usage count (session only)
     user_usage_count[user_id] = user_usage_count.get(user_id, 0) + 1
     user_text = message.text.lower() if message.text else ""
+    # --- Custom creator/owner handler (expanded) ---
+    creator_keywords = [
+        "who made", "who build", "who built", "who is your creator", "who is your developer", "who is your founder", "who is your owner", "who is your maker", "who is behind you", "who created you", "who is the author", "who programmed you", "who is responsible for you", "who is varadgpt's creator", "who is the person behind this bot", "who is the maintainer", "who is the admin", "who is the mastermind", "who is the architect", "who is the engineer", "who is the builder", "who developed you"
+    ]
+    if any(kw in user_text for kw in creator_keywords):
+        await message.reply(
+            "I was created and maintained by Varad Pensalwar (AI/ML Engineer, Data Scientist, GenAI Specialist).\n"
+            "Connect with Varad:\n"
+            "🔗 GitHub: https://github.com/Varadpensalwar\n"
+            "🔗 LinkedIn: https://www.linkedin.com/in/varadpensalwar/\n"
+            "🔗 Twitter: https://twitter.com/PensalwarVarad"
+        )
+        return
     # --- Time/Date Q&A: always reply with no real-time access ---
     if any(kw in user_text for kw in ["what time", "current time", "time is it", "what date", "current date", "date is it", "today", "day is it"]):
         await message.reply("As a bot, I do not have real-time access to date and time. You can check it on your device or preferred source.")
@@ -541,13 +561,70 @@ async def chatgpt(message: types.Message):
         count = user_usage_count.get(user_id, 1)
         await message.reply(f"You have used this bot {count} times in this session.")
         return
-    # --- Project info phrase handler ---
-    if ("tell me project about varad" in user_text or
-        "tell me projects about varad" in user_text or
-        "varad's projects" in user_text or
-        "projects by varad" in user_text or
-        "varad projects" in user_text):
+    # --- Project info phrase handler (very broad/contextual) ---
+    project_keywords = ["project", "projects"]
+    context_keywords = [
+        "your", "you", "varad", "bot", "about", "show", "list", "tell", "demo", "work", "portfolio", "created", "built", "developed", "made", "feature", "featuring", "examples", "sample", "my", "our", "owner", "author", "maintainer"
+    ]
+    if any(pk in user_text for pk in project_keywords) and any(ck in user_text for ck in context_keywords):
         await project_info(message)
+        return
+    # --- Skills/tech stack/expertise handler ---
+    skills_keywords = ["skills", "tech stack", "technology", "technologies", "languages", "tools", "expertise", "specialization", "speciality", "what can you do", "what are you good at", "what do you know"]
+    if any(kw in user_text for kw in skills_keywords):
+        await message.reply(
+            "I'm Varad Pensalwar, an AI/ML Engineer, Data Scientist, and GenAI Specialist.\n"
+            "My expertise includes: Machine Learning, Deep Learning (CNNs, RNNs, Transformers, GANs), Generative AI (LLMs, Diffusion Models), Computer Vision, NLP, Agentic AI, MLOps, and more.\n"
+            "I work with Python, R, SQL, TensorFlow, PyTorch, HuggingFace, LangChain, FastAPI, Docker, and more.\n\n"
+            "See my full profile and projects:\n"
+            "🔗 [GitHub](https://github.com/Varadpensalwar)\n"
+            "🔗 [LinkedIn](https://www.linkedin.com/in/varadpensalwar/)\n"
+            "🔗 [Twitter](https://twitter.com/PensalwarVarad)"
+        )
+        return
+    # --- Contact/social handler ---
+    contact_keywords = ["contact", "connect", "reach", "email", "social", "how to contact", "how to reach", "how to connect", "get in touch"]
+    if any(kw in user_text for kw in contact_keywords):
+        await message.reply(
+            "You can connect with Varad Pensalwar here:\n"
+            "🔗 [GitHub](https://github.com/Varadpensalwar)\n"
+            "🔗 [LinkedIn](https://www.linkedin.com/in/varadpensalwar/)\n"
+            "🔗 [Twitter](https://twitter.com/PensalwarVarad)\n"
+            "Or email: varad.pensalwar@gmail.com"
+        )
+        return
+    # --- Friendly greeting fallback ---
+    greeting_keywords = ["hi", "hello", "hey", "greetings", "good morning", "good afternoon", "good evening", "namaste", "yo", "sup"]
+    if any(greet in user_text for greet in greeting_keywords):
+        await message.reply(
+            "Hello! 👋 I'm VaradGPT Bot, your personal AI assistant.\n"
+            "You can ask me about Varad's projects, skills, or how to contact him.\n"
+            "Try commands like /about or /project, or just ask in your own words!"
+        )
+        return
+    # --- Owner/about Varad handler (very broad) ---
+    varad_keywords = [
+        "who is varad", "tell me about varad", "about varad", "varad pensalwar", "who is varad pensalwar", "varad's profile", "varad's bio", "varad's background", "varad's info",
+        "who are you", "who is the owner", "who is the admin", "who is the founder", "who is the mastermind", "who is the genius behind this", "who is the architect", "who is the engineer", "who is the builder", "who maintains this bot", "who runs this bot", "who is behind this bot", "who is the person behind this bot", "who is the creator of this bot", "who is the author of this bot", "who developed this bot",
+        "who is varadgpt", "varadgpt owner", "varadgpt creator", "varadgpt admin", "varadgpt author", "varadgpt maintainer", "varadgpt developer", "varadgpt founder", "varadgpt background", "varadgpt bio", "varadgpt info",
+        "who made this bot", "who built this bot", "who is responsible for this bot", "who is the genius behind varadgpt", "who is the mastermind behind varadgpt", "who is the developer of varadgpt", "who is the engineer of varadgpt", "who is the architect of varadgpt", "who is the admin of varadgpt", "who is the maintainer of varadgpt", "who is the owner of varadgpt", "who is the founder of varadgpt", "who is the creator of varadgpt"
+    ]
+    if any(kw in user_text for kw in varad_keywords):
+        await message.reply(
+            "Varad Pensalwar is an AI/ML Engineer, Data Scientist, and GenAI Specialist from Pune, India. He is passionate about building intelligent systems that transform reality. Varad is the creator and maintainer of this bot and several other AI projects.\n\n"
+            "Connect with Varad:\n"
+            "🔗 [GitHub](https://github.com/Varadpensalwar)\n"
+            "🔗 [LinkedIn](https://www.linkedin.com/in/varadpensalwar/)\n"
+            "🔗 [Twitter](https://twitter.com/PensalwarVarad)\n",
+            parse_mode="Markdown"
+        )
+        return
+    # --- Resume/CV/Portfolio handler (robust) ---
+    resume_keywords = [
+        "resume", "cv", "curriculum vitae", "portfolio", "profile", "bio", "about your work", "about your experience", "about your education", "your background", "your career", "your journey", "your cv", "your resume", "your portfolio", "your profile", "your bio", "show me your resume", "show me your cv", "send your resume", "send your cv", "can i see your resume", "can i see your cv", "download your resume", "download your cv"
+    ]
+    if any(kw in user_text for kw in resume_keywords):
+        await send_resume(message)
         return
     prev_response = reference.response if reference.response else ""
     safe_text = message.text if isinstance(message.text, str) else ""
@@ -586,7 +663,8 @@ async def set_bot_commands(bot: Bot):
         BotCommand(command="start", description="Start the conversation"),
         BotCommand(command="help", description="Show help menu"),
         BotCommand(command="about", description="About VaradGPT Bot & owner"),
-        BotCommand(command="project", description="About the VaradGPT project"),
+        BotCommand(command="project", description="Show Varad's featured projects"),
+        BotCommand(command="resume", description="View Varad's resume (PDF)"),
         BotCommand(command="clear", description="Clear conversation/context"),
     ]
     await bot.set_my_commands(commands)
@@ -596,6 +674,23 @@ def safe_user_id(message):
     return getattr(getattr(message, 'from_user', None), 'id', None)
 def safe_full_name(message):
     return getattr(getattr(message, 'from_user', None), 'full_name', "Unknown")
+
+@router.message(Command("resume"))
+async def send_resume(message: types.Message):
+    summary = (
+        "*Varad Pensalwar – Resume Summary*\n\n"
+        "🎓 *Education*: B.Tech in Artificial Intelligence & Machine Learning, Sanjay Ghodawat University, Kolhapur\n"
+        "💼 *Experience*: AI/ML Engineer, Data Scientist, GenAI Specialist\n"
+        "🚀 *Key Projects*: VaradGPT Bot, DocMind, BookSense, and more.\n\n"
+        "For full details, see my attached resume.\n"
+        "🔗 [GitHub](https://github.com/Varadpensalwar) | [LinkedIn](https://www.linkedin.com/in/varadpensalwar/) | [Twitter](https://twitter.com/PensalwarVarad)"
+    )
+    await message.reply(summary, parse_mode="Markdown")
+    await message.reply_document(FSInputFile('Varad Resume.pdf'), caption="📄 Varad Pensalwar – Resume")
+
+@router.message(Command("cv"))
+async def send_cv(message: types.Message):
+    await send_resume(message)
 
 if __name__ == "__main__":
     async def main():
