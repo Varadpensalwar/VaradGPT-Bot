@@ -1,6 +1,32 @@
 # VaradGPT Bot 🤖
 
+![Python](https://img.shields.io/badge/python-3.12%2B-blue)
+![License](https://img.shields.io/github/license/Varadpensalwar/VaradGPT-Bot)
+![Last Commit](https://img.shields.io/github/last-commit/Varadpensalwar/VaradGPT-Bot)
+
 A friendly, AI-powered Telegram bot built with Python and OpenAI GPT, featuring timezone and city utilities, voice message transcription, and a customizable user experience.
+
+---
+
+## Table of Contents
+- [Demo](#demo)
+- [Features](#-features)
+- [Tech Stack](#-tech-stack)
+- [Project Structure](#-project-structure)
+- [Installation & Setup](#-installation--setup)
+- [Running the Bot](#-running-the-bot)
+- [Troubleshooting](#-troubleshooting)
+- [Contributing](#-contributing)
+- [License](#-license)
+- [Contact & Support](#-contact--support)
+
+---
+
+## Demo
+
+![VaradGPT Bot Demo](demo/demo.gif)
+
+<sub>_Place your screenshot or GIF at `demo/demo.gif` in the repo to display it here._</sub>
 
 ---
 
@@ -22,7 +48,6 @@ A friendly, AI-powered Telegram bot built with Python and OpenAI GPT, featuring 
   - [aiogram](https://docs.aiogram.dev/) (Telegram Bot API)
   - [openai](https://github.com/openai/openai-python) (ChatGPT/Whisper)
   - [gtts](https://pypi.org/project/gTTS/) (Text-to-Speech)
-  - [pydub](https://github.com/jiaaro/pydub) (Audio processing)
   - [python-dotenv](https://pypi.org/project/python-dotenv/) (Env management)
   - [pytz](https://pypi.org/project/pytz/) (Timezone support)
   - [timezonefinder](https://pypi.org/project/timezonefinder/) (City to timezone)
@@ -92,12 +117,20 @@ python main.py
 ```
 
 ### **Production (Render/Railway/Other)**
-- Ensure `runtime.txt` specifies `python-3.12.3` for compatibility.
-- Set environment variables in your deployment dashboard.
+- Ensure `runtime.txt` specifies `python-3.12.3` (or your desired 3.12.x version) for compatibility.
+- **Set environment variables in your deployment dashboard. Do NOT rely on a .env file for secrets on Render.**
 - Use the start command:
   ```bash
   python main.py
   ```
+
+---
+
+## 🛠️ Troubleshooting
+
+- **TelegramConflictError:** Only one instance of the bot can run at a time. Make sure you are not running the bot locally and on Render at the same time.
+- **Environment Variables Not Detected:** On Render, set your secrets in the dashboard, not in a .env file.
+- **No open ports detected:** This is normal for a Telegram bot using polling. You do not need to specify a port unless you use webhooks or run a web server.
 
 ---
 
