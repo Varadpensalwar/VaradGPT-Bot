@@ -11,5 +11,4 @@ pydub
 google-auth
 google-auth-oauthlib
 aiohttp
-pydub
 requests
