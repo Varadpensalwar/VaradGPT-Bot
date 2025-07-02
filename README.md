@@ -9,7 +9,7 @@ A friendly, AI-powered Telegram bot built with Python and OpenAI GPT, featuring 
 ---
 
 ## Table of Contents
-- [Demo](#demo)
+- [Demo](#-demo)
 - [Features](#-features)
 - [Tech Stack](#-tech-stack)
 - [Project Structure](#-project-structure)
@@ -21,11 +21,11 @@ A friendly, AI-powered Telegram bot built with Python and OpenAI GPT, featuring 
 - [Contact & Support](#-contact--support)
 
 ---
-## Demo
+## 🎬 Demo
 
 [▶️ Watch Demo Video](https://github.com/Varadpensalwar/VaradGPT-Bot/raw/main/Demo.mp4)
 
-**Try the bot:**
+**Try the bot yourself:**
 - **Desktop/PC**: [Open in Telegram Web](https://web.telegram.org/k/#@VaradGPTBot)
 - **Mobile**: [Open in Telegram App](https://t.me/VaradGPTBot)
 ---
@@ -59,14 +59,17 @@ A friendly, AI-powered Telegram bot built with Python and OpenAI GPT, featuring 
 ```text
 VaradGPT-Bot/
 ├── LICENSE
-├── main.py
-├── README.md
-├── requirements.txt
-├── runtime.txt
+├── main.py                    # Main bot application
+├── README.md                  # Project documentation
+├── requirements.txt           # Python dependencies
+├── runtime.txt               # Python version specification
 ├── research/
-│   └── varadgpt_bot.py
-├── varadgptbot/
-│   └── (virtual environment files)
+│   └── varadgpt_bot.py       # Research/development version
+├── Demo.mp4                  # Demo video
+├── Varad Resume.pdf          # Resume file
+├── VaradPensalwar.vcf        # Contact card
+└── varadgptbot/              # Virtual environment (created during setup)
+    └── (virtual environment files)
 ```
 
 ---
@@ -99,7 +102,7 @@ pip install -r requirements.txt
 ```
 
 ### **4. Set up environment variables**
-Create a `.env` file in the project root:
+Create a `.env` file in the project root (see [`requirements.txt`](requirements.txt) for all dependencies):
 ```env
 OPENAI_API_KEY=your-openai-api-key
 TELEGRAM_BOT_TOKEN=your-telegram-bot-token
@@ -113,9 +116,10 @@ TELEGRAM_BOT_TOKEN=your-telegram-bot-token
 ```bash
 python main.py
 ```
+> This will start the bot using the [`main.py`](main.py) file.
 
 ### **Production (Render/Railway/Other)**
-- Ensure `runtime.txt` specifies `python-3.12.3` (or your desired 3.12.x version) for compatibility.
+- Ensure [`runtime.txt`](runtime.txt) specifies `python-3.12.3` (or your desired 3.12.x version) for compatibility.
 - **Set environment variables in your deployment dashboard. Do NOT rely on a .env file for secrets on Render.**
 - Use the start command:
   ```bash
@@ -126,26 +130,31 @@ python main.py
 
 ## 🛠️ Troubleshooting
 
-- **TelegramConflictError:** Only one instance of the bot can run at a time. Make sure you are not running the bot locally and on Render at the same time.
-- **Environment Variables Not Detected:** On Render, set your secrets in the dashboard, not in a .env file.
-- **No open ports detected:** This is normal for a Telegram bot using polling. You do not need to specify a port unless you use webhooks or run a web server.
+Having issues? Here are some common solutions:
+
+- **TelegramConflictError:** Only one instance of the bot can run at a time. Make sure you're not running the bot locally and on a deployment platform (like Render) simultaneously.
+- **Environment Variables Not Detected:** When deploying to platforms like Render, set your secrets in the platform's dashboard rather than using a `.env` file.
+- **"No open ports detected" message:** This is completely normal for a Telegram bot using polling! You don't need to specify a port unless you're using webhooks or running a web server.
 
 ---
 
 ## 📝 Contributing
 
-Contributions are welcome! To contribute:
-1. Fork the repo
+We'd love your help making VaradGPT Bot even better! Here's how to contribute:
+
+1. Fork the repository
 2. Create a new branch (`git checkout -b feature/your-feature`)
 3. Commit your changes (`git commit -am 'Add new feature'`)
 4. Push to the branch (`git push origin feature/your-feature`)
 5. Open a Pull Request
 
+All contributions, big or small, are appreciated! 🙏
+
 ---
 
 ## 📄 License
 
-This project is licensed under the [MIT License](LICENSE).
+This project is licensed under the [MIT License](LICENSE). Feel free to use, modify, and distribute this code!
 
 ---
 
