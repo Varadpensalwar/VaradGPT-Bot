@@ -235,7 +235,7 @@ async def about(message: types.Message):
         await message.reply("User not found.")
         return
     await message.reply("""
-🤖 *VaradGPT Bot*\nCreated by Varad Pensalwar\nPowered by OpenAI GPT\nLanguages: English\nSource: [GitHub](https://github.com/VaradPensalwar)
+🤖 *VaradGPT Bot*\nCreated by Varad Pensalwar\nPowered by OpenAI GPT\nLanguage: English\nSource: [GitHub](https://github.com/VaradPensalwar)
 """, parse_mode="Markdown")
 
 @router.message(lambda m: m.voice is not None)
