@@ -8,7 +8,6 @@ from aiogram.filters import Command
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, BotCommand, InputFile, FSInputFile
 import aiohttp
 from gtts import gTTS
-from pydub import AudioSegment
 import pytz
 import json
 from timezonefinder import TimezoneFinder
