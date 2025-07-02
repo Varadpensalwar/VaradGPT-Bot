@@ -230,13 +230,38 @@ I hope this helps. :)
 
 @router.message(Command("about"))
 async def about(message: types.Message):
-    user_id = safe_user_id(message)
-    if user_id is None:
-        await message.reply("User not found.")
-        return
-    await message.reply("""
-🤖 *VaradGPT Bot*\nCreated by Varad Pensalwar\nPowered by OpenAI GPT\nLanguage: English\nSource: [GitHub](https://github.com/VaradPensalwar)
-""", parse_mode="Markdown")
+    await message.reply(
+        "🤖 *About VaradGPT Bot & Owner*\n\n"
+        "VaradGPT is a conversational AI Telegram bot built using OpenAI's GPT models. It can answer questions, chat, and assist with various tasks.\n\n"
+        "👤 *Bot Owner*: Varad\n"
+        "I am Varad, the creator and maintainer of this bot. If you have questions, feedback, or want to collaborate, feel free to reach out!\n\n"
+        "Features include:\n"
+        "- Natural language conversation\n"
+        "- Birthday and timezone features\n"
+        "- Voice message support\n"
+        "- And more!\n\n"
+        "For feedback or collaboration, contact Varad.",
+        parse_mode="Markdown"
+    )
+
+@router.message(Command("project"))
+async def project_info(message: types.Message):
+    await message.reply(
+        """
+*Here are some of Varad's featured projects:*
+
+"""
+        "*DocMind*\n"
+        "DocMind is an AI-powered PDF information retrieval system that enables users to quickly extract insights from their documents using advanced language models and semantic vector search. With a user-friendly Streamlit web interface, DocMind supports multi-PDF uploads, natural language Q&A, and intelligent document retrieval—making it ideal for researchers, students, and professionals.\n"
+        "[GitHub](https://github.com/Varadpensalwar/DocMind) | [Live Demo](https://docmind-varad-pensalwar.streamlit.app/)\n\n"
+        "*BookSense*\n"
+        "BookSense is an AI-powered semantic book recommender that helps users discover books matching their interests, categories, and emotional tone using advanced NLP and vector search. With a modern Gradio dashboard, BookSense enables natural language queries, emotion and category filtering, and instant recommendations.\n"
+        "[GitHub](https://github.com/Varadpensalwar/BookSense) | [Demo](https://drive.google.com/file/d/1MyUsry_0wvEu-DcefOTXk-ZXc_rUrHoW/view)\n\n"
+        "*VaradGPT Bot*\n"
+        "VaradGPT Bot is a friendly, AI-powered Telegram bot built with Python and OpenAI GPT, offering natural conversational AI, voice message transcription, birthday reminders, and festive greetings. Designed for seamless interaction, it leverages aiogram, OpenAI APIs, and other modern Python libraries to deliver a rich chat experience.\n"
+        "[GitHub](https://github.com/Varadpensalwar/VaradGPT-Bot) | [Try on Telegram](https://web.telegram.org/k/#@VaradGPTBot)\n\n"
+        , parse_mode="Markdown", disable_web_page_preview=True
+    )
 
 @router.message(lambda m: m.voice is not None)
 async def handle_voice(message: types.Message):
@@ -516,6 +541,14 @@ async def chatgpt(message: types.Message):
         count = user_usage_count.get(user_id, 1)
         await message.reply(f"You have used this bot {count} times in this session.")
         return
+    # --- Project info phrase handler ---
+    if ("tell me project about varad" in user_text or
+        "tell me projects about varad" in user_text or
+        "varad's projects" in user_text or
+        "projects by varad" in user_text or
+        "varad projects" in user_text):
+        await project_info(message)
+        return
     prev_response = reference.response if reference.response else ""
     safe_text = message.text if isinstance(message.text, str) else ""
     if not safe_text.strip():
@@ -552,7 +585,8 @@ async def set_bot_commands(bot: Bot):
     commands = [
         BotCommand(command="start", description="Start the conversation"),
         BotCommand(command="help", description="Show help menu"),
-        BotCommand(command="about", description="About VaradGPT Bot"),
+        BotCommand(command="about", description="About VaradGPT Bot & owner"),
+        BotCommand(command="project", description="About the VaradGPT project"),
         BotCommand(command="clear", description="Clear conversation/context"),
     ]
     await bot.set_my_commands(commands)
