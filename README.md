@@ -4,7 +4,7 @@
 ![License](https://img.shields.io/github/license/Varadpensalwar/VaradGPT-Bot)
 ![Last Commit](https://img.shields.io/github/last-commit/Varadpensalwar/VaradGPT-Bot)
 
-A friendly, AI-powered Telegram bot built with Python and OpenAI GPT, featuring timezone and city utilities, voice message transcription, and a customizable user experience.
+A friendly, AI-powered Telegram bot built with Python and OpenAI GPT, featuring voice message transcription, birthday reminders, and festive greetings.
 
 ---
 
@@ -33,11 +33,9 @@ A friendly, AI-powered Telegram bot built with Python and OpenAI GPT, featuring 
 ## ✨ Features
 
 - **Conversational AI**: Powered by OpenAI GPT for natural, context-aware chat.
-- **Timezone & City Utilities**: Users can set their city/timezone and get local time/date info.
 - **Voice Message Transcription**: Converts Telegram voice messages to text using OpenAI Whisper.
 - **Birthday Reminders**: Users can set and be greeted on their birthday.
 - **Festive Greetings**: Sends special greetings on holidays and festivals.
-- **English-only, clean, and privacy-friendly**: No language selection, no feedback logging, and no external data storage.
 
 ---
 
