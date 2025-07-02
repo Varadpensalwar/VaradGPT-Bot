@@ -22,9 +22,10 @@ A friendly, AI-powered Telegram bot built with Python and OpenAI GPT, featuring 
 
 ---
 ## Demo
-
-<div style="text-align: center;">
-    <video src="https://github.com/Varadpensalwar/VaradGPT-Bot/blob/main/Demo.mp4" controls width="100%"></video>
+<div align="center">
+    <video src="https://github.com/Varadpensalwar/VaradGPT-Bot/raw/main/Demo.mp4" controls width="100%">
+        Your browser does not support the video tag.
+    </video>
 </div>
 
 **Try the bot:**
