@@ -22,11 +22,8 @@ A friendly, AI-powered Telegram bot built with Python and OpenAI GPT, featuring 
 
 ---
 ## Demo
-<div align="center">
-    <video src="https://github.com/Varadpensalwar/VaradGPT-Bot/raw/main/Demo.mp4" controls width="100%">
-        Your browser does not support the video tag.
-    </video>
-</div>
+
+[▶️ Watch Demo Video](https://github.com/Varadpensalwar/VaradGPT-Bot/raw/main/Demo.mp4)
 
 **Try the bot:**
 - **Desktop/PC**: [Open in Telegram Web](https://web.telegram.org/k/#@VaradGPTBot)
