@@ -21,12 +21,13 @@ A friendly, AI-powered Telegram bot built with Python and OpenAI GPT, featuring 
 - [Contact & Support](#-contact--support)
 
 ---
-
 ## Demo
-
 ![VaradGPT Bot Demo](demo/demo.gif)
-
 <sub>_Place your screenshot or GIF at `demo/demo.gif` in the repo to display it here._</sub>
+
+**Try the bot:**
+- **Desktop/PC**: [Open in Telegram Web](https://web.telegram.org/k/#@VaradGPTBot)
+- **Mobile**: [Open in Telegram App](https://t.me/VaradGPTBot)
 
 ---
 
