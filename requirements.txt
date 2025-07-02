@@ -11,3 +11,4 @@ google-auth
 google-auth-oauthlib
 aiohttp
 requests
+rapidfuzz

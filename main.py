@@ -17,6 +17,8 @@ from aiogram.fsm.state import State, StatesGroup
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.storage.memory import MemoryStorage
 from datetime import datetime
+import re
+from rapidfuzz import fuzz, process
 
 load_dotenv()
 openai.api_key = os.getenv("OPENAI_API_KEY")
@@ -431,8 +433,184 @@ async def set_city(message: types.Message):
         else:
             await message.reply("Please set your city or timezone using: /setcity <your city or timezone>")
 
-# Move the catch-all handler to the end of the file
-# --- Update chatgpt handler for time/date questions ---
+# Move these handlers above the catch-all
+@router.message(Command("resume"))
+async def send_resume(message: types.Message):
+    summary = (
+        "*Varad Pensalwar – Resume Summary*\n\n"
+        "🎓 *Education*: B.Tech in Artificial Intelligence & Machine Learning, Sanjay Ghodawat University, Kolhapur\n"
+        "💼 *Experience*: AI/ML Engineer, Data Scientist, GenAI Specialist\n"
+        "🚀 *Key Projects*: VaradGPT Bot, DocMind, BookSense, and more.\n\n"
+        "For full details, see my attached resume.\n"
+        "🔗 [GitHub](https://github.com/Varadpensalwar) | [LinkedIn](https://www.linkedin.com/in/varadpensalwar/) | [Twitter](https://twitter.com/PensalwarVarad)"
+    )
+    await message.reply(summary, parse_mode="Markdown")
+    await message.reply_document(FSInputFile('Varad Resume.pdf'), caption="📄 Varad Pensalwar – Resume")
+
+@router.message(Command("cv"))
+async def send_cv(message: types.Message):
+    await send_resume(message)
+
+# Add a regex-based handler for /resume and /cv with extra words
+@router.message(lambda m: isinstance(m.text, str) and re.match(r"^/(resume|cv)\b", m.text.lower()))
+async def send_resume_regex(message: types.Message):
+    await send_resume(message)
+
+# Ultra-flexible resume/cv/portfolio handler (natural language, regex-based)
+@router.message(lambda m: isinstance(m.text, str) and re.search(
+    r'(?i)(/)?(resume|resumé|cv|curricul[au]m vitae|portfolio|portfolyo|profile|bio|background|experience|education|journey|career|work)[^a-z]*'
+    r'(varad|pensalwar|your|you|bot|owner|admin|creator|author|maintainer|developer|founder)?', m.text))
+async def send_resume_natural(message: types.Message):
+    await send_resume(message)
+
+# Ultra-flexible owner/creator/admin handler (regex-based)
+@router.message(lambda m: isinstance(m.text, str) and re.search(
+    r'(?i)(who (is )?(the )?(owner|creator|maker|admin|author|maintainer|developer|founder|builder|created|built|make|made)|owner|creator|maker|admin|author|maintainer|developer|founder|built|made|make|created)( of (this|the|varadgpt|bot|project|service|assistant|application|code|software|platform|system|solution|product|tool))?', m.text))
+async def send_owner_info(message: types.Message):
+    await message.reply(
+        "Varad Pensalwar is the owner, creator, and maintainer of this bot and several other AI projects.\n\n"
+        "Connect with Varad:\n"
+        "🔗 [GitHub](https://github.com/Varadpensalwar)\n"
+        "🔗 [LinkedIn](https://www.linkedin.com/in/varadpensalwar/)\n"
+        "🔗 [Twitter](https://twitter.com/PensalwarVarad)",
+        parse_mode="Markdown"
+    )
+
+# 4. About Varad Handler (move above Q&A handler)
+@router.message(lambda m: isinstance(m.text, str) and (
+    re.search(r'(?i)(about|abotu|abot|abou|bio|profile|background|info|details|story|journey|who is|who\'s|who are|tell me|describe|introduce|introduction|summary|summarize)', m.text) and
+    re.search(r'(?i)(varad|you|his|her|their|the owner\'s|the creator\'s|the admin\'s|the maintainer\'s|the developer\'s|the founder\'s)', m.text) and
+    not any(p in m.text.lower() for p in ["resume", "cv", "project", "projects"])
+))
+async def send_varad_info_intent(message: types.Message):
+    await message.reply(
+        "Varad Pensalwar is an AI/ML Engineer, Data Scientist, and GenAI Specialist from Pune, India. He is passionate about building intelligent systems that transform reality. Varad is the creator and maintainer of this bot and several other AI projects.\n\n"
+        "Connect with Varad:\n"
+        "🔗 [GitHub](https://github.com/Varadpensalwar)\n"
+        "🔗 [LinkedIn](https://www.linkedin.com/in/varadpensalwar/)\n"
+        "🔗 [Twitter](https://twitter.com/PensalwarVarad)",
+        parse_mode="Markdown"
+    )
+
+# 5. Q&A About Varad Handler (typo-tolerant, intent-based)
+qa_pairs = {
+    "favorite programming language": "Python!",
+    "what inspires": "Building things that help people, AI progress, and curiosity.",
+    "hobbies": "Chess, Coding, reading, exploring AI, music, and travel.",
+    "mission": "To push the boundaries of AI and make technology accessible and helpful for everyone.",
+    "where are you from": "Pune, Maharashtra, India 🇮🇳",
+    "educational background": "B.Tech in Artificial Intelligence & Machine Learning from Sanjay Ghodawat University, Kolhapur.",
+    "favorite ai technology": "Large Language Models (LLMs) and Generative AI!",
+    "dream project": "Building an AI assistant that can truly understand and help people in their daily lives.",
+    "favorite book": "Learning LangChain: Building AI and LLM Applications with LangChain and LangGraph by Mayo Oshin & Nuno Campos.",
+    "favorite quote": "The future belongs to those who understand AI.",
+    "favorite chess opening": "The Queen's Gambit!",
+    "programming languages": "Python, SQL, and a bit of JavaScript.",
+    "favorite open-source project": "HuggingFace Transformers.",
+    "relax": "Listening to music and playing chess.",
+    "github": "[Varadpensalwar](https://github.com/Varadpensalwar)",
+    "linkedin": "[linkedin.com/in/varadpensalwar](https://www.linkedin.com/in/varadpensalwar/)",
+    "twitter": "[@PensalwarVarad](https://twitter.com/PensalwarVarad)",
+    "favorite ai application": "Conversational AI bots and creative AI tools.",
+    "favorite tech in gen ai": "LangChain.",
+    "favorite sport": "Chess!",
+    "favorite food": "Indian cuisine, especially paneer dishes.",
+    "favorite place": "Sydney, Australia.",
+    "favorite music genre": "Classical and instrumental.",
+    "long-term goal": "To lead impactful AI projects and contribute to the global AI community.",
+    "favorite movie": "My favorite movie is Bloody Daddy!",
+    "favorite programming framework": "I love working with FastAPI for building modern web APIs.",
+    "favorite ide or code editor": "My go-to code editor is VS Code for its versatility and extensions.",
+    "favorite holiday destination": "Sydney, Australia is my favorite holiday destination!",
+    "favorite startup or tech company": "I admire Google and Atlassian for their innovation and impact.",
+    "favorite productivity tool": "Notion and Cursor are my favorite productivity tools for organizing work and ideas.",
+    "favorite youtube channel or podcast": "I enjoy learning from Code With Harry on YouTube.",
+    "favorite color": "Orange is my favorite color—it's vibrant and energetic!",
+    "favorite animal": "The tiger is my favorite animal, symbolizing strength and courage.",
+    "favorite subject in school": "Math was always my favorite subject.",
+    "favorite way to learn new things": "I love learning from official documentation—it's the most reliable source!",
+    "favorite ai use case": "I love using AI for solving bugs and making development smoother.",
+    "favorite thing about being an ai/ml engineer": "Watching code transform raw data into intelligent insights that nobody has ever seen before is the best part of being an AI/ML engineer."
+}
+
+def is_varad_qa_question(m):
+    if not isinstance(m.text, str):
+        return False
+    # Exclude generic identity questions
+    identity_phrases = ["who are you", "who is varad", "who am i", "who's", "who is the owner", "who is the creator"]
+    if any(phrase in m.text.lower() for phrase in identity_phrases):
+        return False
+    return any(fuzz.partial_ratio(m.text.lower(), q) >= 80 for q in qa_pairs.keys())
+
+@router.message(is_varad_qa_question)
+async def send_varad_qa(message: types.Message):
+    # Find the best match
+    if not isinstance(message.text, str):
+        return
+    best_q, score, _ = process.extractOne(message.text.lower(), qa_pairs.keys(), scorer=fuzz.partial_ratio)
+    if score >= 80:
+        answer = qa_pairs[best_q]
+        await message.reply(answer)
+
+# 1. Resume/CV/Portfolio Handler (add negative check for identity questions)
+@router.message(lambda m: isinstance(m.text, str) and (
+    any(fuzz.partial_ratio(word, kw) >= 85 for word in m.text.lower().split() for kw in ["resume", "cv", "curriculum vitae", "portfolio", "profile", "bio", "background", "experience", "education", "journey", "career", "work"]) and
+    any(ctx in m.text.lower() for ctx in ["varad", "pensalwar", "your", "you", "bot", "owner", "admin", "creator", "author", "maintainer", "developer", "founder", "his", "her", "their", "the owner's", "the creator's", "the admin's", "the maintainer's", "the developer's", "the founder's"]) and
+    not any(p in m.text.lower() for p in ["project", "projects"]) and
+    not any(phrase in m.text.lower() for phrase in ["who are you", "who is varad", "who am i", "who's", "who is the owner", "who is the creator"])
+))
+async def send_resume_intent(message: types.Message):
+    await send_resume(message)
+
+@router.message(Command("contact"))
+async def send_contact(message: types.Message):
+    contact_text = (
+        "Here's how you can connect with Varad Pensalwar:\n\n"
+        "🔗 [GitHub](https://github.com/Varadpensalwar)\n"
+        "🔗 [LinkedIn](https://www.linkedin.com/in/varadpensalwar/)\n"
+        "🔗 [Twitter](https://twitter.com/PensalwarVarad)\n"
+        "✉️ Email: varad.pensalwar@gmail.com\n"
+    )
+    await message.reply(contact_text, parse_mode="Markdown")
+    # Optionally send vCard if present
+    vcard_path = "VaradPensalwar.vcf"
+    if os.path.exists(vcard_path):
+        await message.reply_document(vcard_path, caption="📇 Varad Pensalwar – vCard")
+
+# Contact Card Handler (robust, typo-tolerant, intent-based)
+def is_contact_request(m):
+    if not isinstance(m.text, str):
+        return False
+    contact_words = [
+        "contact", "email", "phone", "connect", "reach", "information", "details", "how to contact", "how to reach", "how to connect", "get in touch", "address", "social", "whatsapp", "telegram"
+    ]
+    context_words = [
+        "varad", "owner", "creator", "him", "his", "their", "pensalwar", "bot"
+    ]
+    text = m.text.lower()
+    # typo-tolerant: match if any contact word is close and any context word is present
+    if any(fuzz.partial_ratio(word, cw) >= 80 for word in text.split() for cw in contact_words) and any(ctx in text for ctx in context_words):
+        return True
+    # also match if both a contact word and a context word appear anywhere in the text
+    if any(cw in text for cw in contact_words) and any(ctx in text for ctx in context_words):
+        return True
+    return False
+
+@router.message(is_contact_request)
+async def send_contact_intent(message: types.Message):
+    contact_text = (
+        "Here's how you can connect with Varad Pensalwar:\n\n"
+        "🔗 [GitHub](https://github.com/Varadpensalwar)\n"
+        "🔗 [LinkedIn](https://www.linkedin.com/in/varadpensalwar/)\n"
+        "🔗 [Twitter](https://twitter.com/PensalwarVarad)\n"
+        "✉️ Email: varad.pensalwar@gmail.com\n"
+    )
+    await message.reply(contact_text, parse_mode="Markdown")
+    vcard_path = "VaradPensalwar.vcf"
+    if os.path.exists(vcard_path):
+        await message.reply_document(vcard_path, caption="📇 Varad Pensalwar – vCard")
+
+# Ensure the catch-all handler remains at the end
 @router.message()
 async def chatgpt(message: types.Message):
     user_id = safe_user_id(message)
@@ -442,6 +620,26 @@ async def chatgpt(message: types.Message):
     # Track usage count (session only)
     user_usage_count[user_id] = user_usage_count.get(user_id, 0) + 1
     user_text = message.text.lower() if message.text else ""
+    # Fuzzy typo-tolerant resume/CV/portfolio handler (rapidfuzz)
+    # (pip install rapidfuzz)
+    resume_keywords = [
+        "resume", "cv", "curriculum vitae", "portfolio", "profile", "bio", "background",
+        "experience", "education", "journey", "career", "work"
+    ]
+    context_keywords = [
+        "varad", "pensalwar", "your", "you", "bot", "owner", "admin", "creator",
+        "author", "maintainer", "developer", "founder"
+    ]
+    def fuzzy_in(text, keywords, threshold=85):
+        return any(fuzz.partial_ratio(text, kw) >= threshold for kw in keywords)
+    user_text_words = user_text.split()
+    for word in user_text_words:
+        if fuzzy_in(word, resume_keywords) and any(ctx in user_text for ctx in context_keywords):
+            await send_resume(message)
+            return
+        if fuzzy_in(word, context_keywords) and any(rk in user_text for rk in resume_keywords):
+            await send_resume(message)
+            return
     # --- Custom creator/owner handler (expanded) ---
     creator_keywords = [
         "who made", "who build", "who built", "who is your creator", "who is your developer", "who is your founder", "who is your owner", "who is your maker", "who is behind you", "who created you", "who is the author", "who programmed you", "who is responsible for you", "who is varadgpt's creator", "who is the person behind this bot", "who is the maintainer", "who is the admin", "who is the mastermind", "who is the architect", "who is the engineer", "who is the builder", "who developed you"
@@ -467,7 +665,6 @@ async def chatgpt(message: types.Message):
         await message.reply(f"Your city/timezone has been set to: {location}")
         return
     # --- Time/Date Q&A ---
-    import re
     time_city_match = re.search(r'what time is it in ([\w\s,\-]+)\??', user_text)
     date_city_match = re.search(r'what day is it in ([\w\s,\-]+)\??', user_text)
     city = None
@@ -619,13 +816,23 @@ async def chatgpt(message: types.Message):
             parse_mode="Markdown"
         )
         return
-    # --- Resume/CV/Portfolio handler (robust) ---
-    resume_keywords = [
-        "resume", "cv", "curriculum vitae", "portfolio", "profile", "bio", "about your work", "about your experience", "about your education", "your background", "your career", "your journey", "your cv", "your resume", "your portfolio", "your profile", "your bio", "show me your resume", "show me your cv", "send your resume", "send your cv", "can i see your resume", "can i see your cv", "download your resume", "download your cv"
+    # --- Resume/CV/Portfolio handler (maximally flexible) ---
+    resume_words = [
+        "resume", "cv", "curriculum vitae", "portfolio", "profile", "bio", "background", "experience", "education", "journey", "career", "work"
     ]
-    if any(kw in user_text for kw in resume_keywords):
+    context_words = [
+        "varad", "pensalwar", "your", "you", "bot", "owner", "admin", "creator", "author", "maintainer", "developer", "founder"
+    ]
+    if any(rw in user_text for rw in resume_words) and any(cw in user_text for cw in context_words):
         await send_resume(message)
         return
+    # --- Resume/CV/Portfolio handler (ultra-flexible, regex-based, fallback) ---
+    for rword in resume_words:
+        for cword in context_words:
+            pattern = rf"{rword}(?:\W+\w+){{0,5}}\W+{cword}|{cword}(?:\W+\w+){{0,5}}\W+{rword}"
+            if re.search(pattern, user_text):
+                await send_resume(message)
+                return
     prev_response = reference.response if reference.response else ""
     safe_text = message.text if isinstance(message.text, str) else ""
     if not safe_text.strip():
@@ -665,6 +872,7 @@ async def set_bot_commands(bot: Bot):
         BotCommand(command="about", description="About VaradGPT Bot & owner"),
         BotCommand(command="project", description="Show Varad's featured projects"),
         BotCommand(command="resume", description="View Varad's resume (PDF)"),
+        BotCommand(command="contact", description="Contact Varad (links & email)"),
         BotCommand(command="clear", description="Clear conversation/context"),
     ]
     await bot.set_my_commands(commands)
@@ -674,23 +882,6 @@ def safe_user_id(message):
     return getattr(getattr(message, 'from_user', None), 'id', None)
 def safe_full_name(message):
     return getattr(getattr(message, 'from_user', None), 'full_name', "Unknown")
-
-@router.message(Command("resume"))
-async def send_resume(message: types.Message):
-    summary = (
-        "*Varad Pensalwar – Resume Summary*\n\n"
-        "🎓 *Education*: B.Tech in Artificial Intelligence & Machine Learning, Sanjay Ghodawat University, Kolhapur\n"
-        "💼 *Experience*: AI/ML Engineer, Data Scientist, GenAI Specialist\n"
-        "🚀 *Key Projects*: VaradGPT Bot, DocMind, BookSense, and more.\n\n"
-        "For full details, see my attached resume.\n"
-        "🔗 [GitHub](https://github.com/Varadpensalwar) | [LinkedIn](https://www.linkedin.com/in/varadpensalwar/) | [Twitter](https://twitter.com/PensalwarVarad)"
-    )
-    await message.reply(summary, parse_mode="Markdown")
-    await message.reply_document(FSInputFile('Varad Resume.pdf'), caption="📄 Varad Pensalwar – Resume")
-
-@router.message(Command("cv"))
-async def send_cv(message: types.Message):
-    await send_resume(message)
 
 if __name__ == "__main__":
     async def main():
