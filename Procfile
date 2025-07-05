@@ -1,1 +1,1 @@
-web: python simple_deploy.py 
+web: python health_check.py 
