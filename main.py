@@ -219,7 +219,7 @@ async def welcome(message: types.Message):
         "I'm VaradGPT Bot, your personal AI assistant.\n"
         "How can I help you today?"
     )
-    await message.reply(greeting)
+    await bot.send_message(chat_id=message.chat.id, text=greeting)
 
 @router.message(Command("help"))
 async def helper(message: types.Message):
