@@ -1,1 +1,1 @@
-worker: python deploy.py 
+web: python health_check.py 
