@@ -60,6 +60,11 @@ A friendly, AI-powered Telegram bot built with Python and OpenAI GPT, featuring 
 VaradGPT-Bot/
 ├── LICENSE
 ├── main.py                    # Main bot application
+├── deploy.py                  # Deployment entry point with error handling
+├── health_check.py            # Web server with health check endpoint
+├── Procfile                   # Deployment configuration for platforms
+├── Procfile.web              # Alternative Procfile for web server platforms
+├── DEPLOYMENT.md             # Comprehensive deployment guide
 ├── README.md                  # Project documentation
 ├── requirements.txt           # Python dependencies
 ├── runtime.txt               # Python version specification
@@ -123,8 +128,9 @@ python main.py
 - **Set environment variables in your deployment dashboard. Do NOT rely on a .env file for secrets on Render.**
 - Use the start command:
   ```bash
-  python main.py
+  python deploy.py
   ```
+- **For detailed deployment instructions, see [DEPLOYMENT.md](DEPLOYMENT.md)**
 
 ---
 

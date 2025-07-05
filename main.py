@@ -1,7 +1,7 @@
 from dotenv import load_dotenv
 import os
 from aiogram import Bot, Dispatcher, types, Router
-import openai
+from openai import OpenAI
 import sys
 import asyncio
 from aiogram.filters import Command
@@ -21,10 +21,15 @@ import re
 from rapidfuzz import fuzz, process
 
 load_dotenv()
-openai.api_key = os.getenv("OPENAI_API_KEY")
+
+# Initialize OpenAI client with new API
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
-print("DEBUG: openai.api_key =", openai.api_key, "TELEGRAM_BOT_TOKEN =", TELEGRAM_BOT_TOKEN)
-if not openai.api_key or not TELEGRAM_BOT_TOKEN:
+
+print("DEBUG: OpenAI API Key set:", bool(os.getenv("OPENAI_API_KEY")))
+print("DEBUG: Telegram Bot Token set:", bool(TELEGRAM_BOT_TOKEN))
+
+if not os.getenv("OPENAI_API_KEY") or not TELEGRAM_BOT_TOKEN:
     raise RuntimeError("OPENAI_API_KEY and TELEGRAM_BOT_TOKEN must be set in environment variables.")
 
 
@@ -34,7 +39,7 @@ class Reference:
     '''
 
     def __init__(self) -> None:
-        self.response = ""
+        self.response: str = ""
 
 
 
@@ -242,7 +247,7 @@ async def about(message: types.Message):
         "- Birthday and timezone features\n"
         "- Voice message support\n"
         "- And more!\n\n"
-        "🔗 [Website](https://varadpensalwar.github.io/)\n"
+        "🔗 [Website](https://varadpensalwar.vercel.app/)\n"
         "🔗 [GitHub](https://github.com/Varadpensalwar)\n"
         "🔗 [LinkedIn](https://www.linkedin.com/in/varadpensalwar/)\n"
         "🔗 [Twitter](https://twitter.com/PensalwarVarad)\n"
@@ -297,11 +302,11 @@ async def handle_voice(message: types.Message):
     transcription = None
     try:
         with open(ogg_path, 'rb') as audio_file:
-            transcript_resp = openai.Audio.transcribe("whisper-1", audio_file)
-            if isinstance(transcript_resp, dict):
-                transcription = transcript_resp.get('text', '')
-            else:
-                transcription = ''
+            transcript_resp = client.audio.transcriptions.create(
+                model="whisper-1",
+                file=audio_file
+            )
+            transcription = transcript_resp.text
     except Exception as e:
         await message.reply("Sorry, I couldn't transcribe your voice message.")
         os.remove(ogg_path)
@@ -312,15 +317,18 @@ async def handle_voice(message: types.Message):
     prev_response = reference.response if reference.response else ""
     try:
         safe_text = transcription if isinstance(transcription, str) else ""
-        response = openai.ChatCompletion.create(
+        response = client.chat.completions.create(
             model = model_name,
             messages = [
                 {"role": "assistant", "content": prev_response},
                 {"role": "user", "content": safe_text + "\nPlease answer in English."}
             ]
         )
-        if isinstance(response, dict) and 'choices' in response and response['choices']:
-            chatgpt_reply = response['choices'][0]['message']['content']
+        if response and response.choices:
+            chatgpt_reply = response.choices[0].message.content
+            if chatgpt_reply is None:
+                await message.reply("Sorry, I couldn't get a valid response from ChatGPT.")
+                return
         else:
             await message.reply("Sorry, I couldn't get a valid response from ChatGPT.")
             return
@@ -442,7 +450,7 @@ async def send_resume(message: types.Message):
         "💼 *Experience*: AI/ML Engineer, Data Scientist, GenAI Specialist\n"
         "🚀 *Key Projects*: VaradGPT Bot, DocMind, BookSense, and more.\n\n"
         "For full details, see my attached resume.\n"
-        "🔗 [Website](https://varadpensalwar.github.io/)\n"
+        "🔗 [Website](https://varadpensalwar.vercel.app/)\n"
         "🔗 [GitHub](https://github.com/Varadpensalwar)\n"
         "🔗 [LinkedIn](https://www.linkedin.com/in/varadpensalwar/)\n"
         "🔗 [Twitter](https://twitter.com/PensalwarVarad)\n"
@@ -473,7 +481,7 @@ async def send_resume_natural(message: types.Message):
 async def send_owner_info(message: types.Message):
     await message.reply(
         "Varad Pensalwar is the owner, creator, and maintainer of this bot and several other AI projects.\n\n"
-        "🔗 [Website](https://varadpensalwar.github.io/)\n"
+        "🔗 [Website](https://varadpensalwar.vercel.app/)\n"
         "🔗 [GitHub](https://github.com/Varadpensalwar)\n"
         "🔗 [LinkedIn](https://www.linkedin.com/in/varadpensalwar/)\n"
         "🔗 [Twitter](https://twitter.com/PensalwarVarad)\n"
@@ -489,7 +497,7 @@ async def send_owner_info(message: types.Message):
 async def send_varad_info_intent(message: types.Message):
     await message.reply(
         "Varad Pensalwar is an AI/ML Engineer, Data Scientist, and GenAI Specialist from Pune, India. He is passionate about building intelligent systems that transform reality. Varad is the creator and maintainer of this bot and several other AI projects.\n\n"
-        "🔗 [Website](https://varadpensalwar.github.io/)\n"
+        "🔗 [Website](https://varadpensalwar.vercel.app/)\n"
         "🔗 [GitHub](https://github.com/Varadpensalwar)\n"
         "🔗 [LinkedIn](https://www.linkedin.com/in/varadpensalwar/)\n"
         "🔗 [Twitter](https://twitter.com/PensalwarVarad)\n"
@@ -535,9 +543,9 @@ qa_pairs = {
     "favorite way to learn new things": "I love learning from official documentation—it's the most reliable source!",
     "favorite ai use case": "I love using AI for solving bugs and making development smoother.",
     "favorite thing about being an ai/ml engineer": "Watching code transform raw data into intelligent insights that nobody has ever seen before is the best part of being an AI/ML engineer.",
-    "website": "🔗 [Website](https://varadpensalwar.github.io/)",
-    "portfolio": "You can explore my portfolio and learn more about me at 🔗 [Website](https://varadpensalwar.github.io/)",
-    "personal website": "My personal website is 🔗 [Website](https://varadpensalwar.github.io/)",
+    "website": "🔗 [Website](https://varadpensalwar.vercel.app/)",
+    "portfolio": "You can explore my portfolio and learn more about me at 🔗 [Website](https://varadpensalwar.vercel.app/)",
+    "personal website": "My personal website is 🔗 [Website](https://varadpensalwar.vercel.app/)",
 }
 
 def is_varad_qa_question(m):
@@ -558,8 +566,8 @@ async def send_varad_qa(message: types.Message):
     if score >= 80:
         answer = qa_pairs[best_q]
         # If the question is about portfolio, website, or background, append the website link if not present
-        if best_q in ["portfolio", "website", "personal website", "background", "about", "bio"] and "varadpensalwar.github.io" not in answer:
-            answer += "\n🔗 [Website](https://varadpensalwar.github.io/)"
+        if best_q in ["portfolio", "website", "personal website", "background", "about", "bio"] and "varadpensalwar.vercel.app" not in answer:
+            answer += "\n🔗 [Website](https://varadpensalwar.vercel.app/)"
         await message.reply(answer)
 
 # Contact Card Handler (robust, typo-tolerant, intent-based)
@@ -585,7 +593,7 @@ def is_contact_request(m):
 async def send_contact_intent(message: types.Message):
     contact_text = (
         "Here's how you can connect with Varad Pensalwar:\n\n"
-        "🔗 [Website](https://varadpensalwar.github.io/)\n"
+        "🔗 [Website](https://varadpensalwar.vercel.app/)\n"
         "🔗 [GitHub](https://github.com/Varadpensalwar)\n"
         "🔗 [LinkedIn](https://www.linkedin.com/in/varadpensalwar/)\n"
         "🔗 [Twitter](https://twitter.com/PensalwarVarad)\n"
@@ -610,7 +618,7 @@ async def send_resume_intent(message: types.Message):
 async def send_contact(message: types.Message):
     contact_text = (
         "Here's how you can connect with Varad Pensalwar:\n\n"
-        "🔗 [Website](https://varadpensalwar.github.io/)\n"
+        "🔗 [Website](https://varadpensalwar.vercel.app/)\n"
         "🔗 [GitHub](https://github.com/Varadpensalwar)\n"
         "🔗 [LinkedIn](https://www.linkedin.com/in/varadpensalwar/)\n"
         "🔗 [Twitter](https://twitter.com/PensalwarVarad)\n"
@@ -624,7 +632,7 @@ async def send_contact(message: types.Message):
 @router.message(Command("website"))
 async def send_website(message: types.Message):
     await message.reply(
-        "🔗 Varad Pensalwar's personal website/portfolio:\n🔗 [Website](https://varadpensalwar.github.io/)",
+        "🔗 Varad Pensalwar's personal website/portfolio:\n🔗 [Website](https://varadpensalwar.vercel.app/)",
         parse_mode="Markdown"
     )
 
@@ -665,7 +673,7 @@ async def chatgpt(message: types.Message):
     if any(kw in user_text for kw in creator_keywords):
         await message.reply(
             "I was created and maintained by Varad Pensalwar (AI/ML Engineer, Data Scientist, GenAI Specialist).\n"
-            "🔗 [Website](https://varadpensalwar.github.io/)\n"
+            "🔗 [Website](https://varadpensalwar.vercel.app/)\n"
             "🔗 GitHub: https://github.com/Varadpensalwar\n"
             "🔗 LinkedIn: https://www.linkedin.com/in/varadpensalwar/\n"
             "🔗 Twitter: https://twitter.com/PensalwarVarad"
@@ -802,7 +810,7 @@ async def chatgpt(message: types.Message):
     if any(kw in user_text for kw in contact_keywords):
         await message.reply(
             "You can connect with Varad Pensalwar here:\n"
-            "🔗 [Website](https://varadpensalwar.github.io/)\n"
+            "🔗 [Website](https://varadpensalwar.vercel.app/)\n"
             "🔗 [GitHub](https://github.com/Varadpensalwar)\n"
             "🔗 [LinkedIn](https://www.linkedin.com/in/varadpensalwar/)\n"
             "🔗 [Twitter](https://twitter.com/PensalwarVarad)\n"
@@ -828,7 +836,7 @@ async def chatgpt(message: types.Message):
     if any(kw in user_text for kw in varad_keywords):
         await message.reply(
             "Varad Pensalwar is an AI/ML Engineer, Data Scientist, and GenAI Specialist from Pune, India. He is passionate about building intelligent systems that transform reality. Varad is the creator and maintainer of this bot and several other AI projects.\n\n"
-            "🔗 [Website](https://varadpensalwar.github.io/)\n"
+            "🔗 [Website](https://varadpensalwar.vercel.app/)\n"
             "🔗 [GitHub](https://github.com/Varadpensalwar)\n"
             "🔗 [LinkedIn](https://www.linkedin.com/in/varadpensalwar/)\n"
             "🔗 [Twitter](https://twitter.com/PensalwarVarad)\n"
@@ -858,15 +866,18 @@ async def chatgpt(message: types.Message):
         await message.reply("Please send a valid message.")
         return
     try:
-        response = openai.ChatCompletion.create(
+        response = client.chat.completions.create(
             model = model_name,
             messages = [
                 {"role": "assistant", "content": prev_response},
                 {"role": "user", "content": safe_text + "\nPlease answer in English."}
             ]
         )
-        if isinstance(response, dict) and 'choices' in response and response['choices']:
-            chatgpt_reply = response['choices'][0]['message']['content']
+        if response and response.choices:
+            chatgpt_reply = response.choices[0].message.content
+            if chatgpt_reply is None:
+                await message.reply("Sorry, I couldn't get a valid response from ChatGPT.")
+                return
         else:
             await message.reply("Sorry, I couldn't get a valid response from ChatGPT.")
             return
