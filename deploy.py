@@ -8,7 +8,6 @@ import os
 import sys
 import logging
 import asyncio
-from dotenv import load_dotenv
 
 # Configure logging for deployment
 logging.basicConfig(
@@ -23,7 +22,12 @@ logger = logging.getLogger(__name__)
 
 def check_environment():
     """Check if all required environment variables are set"""
-    load_dotenv()
+    # Try to load dotenv if available
+    try:
+        from dotenv import load_dotenv
+        load_dotenv()
+    except ImportError:
+        logger.info("python-dotenv not available, using system environment variables")
     
     required_vars = ['OPENAI_API_KEY', 'TELEGRAM_BOT_TOKEN']
     missing_vars = []
@@ -49,8 +53,13 @@ async def main():
         if not check_environment():
             sys.exit(1)
         
-        # Import main bot functionality
-        from main import on_startup, dispatcher, bot
+        # Import main bot functionality with error handling
+        try:
+            from main import on_startup, dispatcher, bot
+        except ImportError as e:
+            logger.error(f"Failed to import bot modules: {e}")
+            logger.error("Make sure all required packages are installed")
+            sys.exit(1)
         
         logger.info("Initializing bot...")
         await on_startup(dispatcher)
@@ -62,6 +71,7 @@ async def main():
         logger.info("Bot stopped by user")
     except Exception as e:
         logger.error(f"Fatal error: {e}")
+        logger.error("Check your environment variables and bot configuration")
         sys.exit(1)
 
 if __name__ == "__main__":

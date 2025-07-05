@@ -1,1 +1,1 @@
-worker: python deploy.py 
+web: python simple_deploy.py 
