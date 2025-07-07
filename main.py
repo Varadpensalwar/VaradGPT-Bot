@@ -251,7 +251,7 @@ async def about(message: types.Message):
         "- Birthday and timezone features\n"
         "- Voice message support\n"
         "- And more!\n\n"
-        "🔗 [Website](https://varadpensalwar.github.io/)\n"
+        "🔗 [Website](https://varadpensalwar.vercel.app/)\n"
         "🔗 [GitHub](https://github.com/Varadpensalwar)\n"
         "🔗 [LinkedIn](https://www.linkedin.com/in/varadpensalwar/)\n"
         "🔗 [Twitter](https://twitter.com/PensalwarVarad)\n"
@@ -454,10 +454,10 @@ async def send_resume(message: types.Message):
     summary = (
         "*Varad Pensalwar – Resume Summary*\n\n"
         "🎓 *Education*: B.Tech in Artificial Intelligence & Machine Learning, Sanjay Ghodawat University, Kolhapur\n"
-        "💼 *Experience*: AI/ML Engineer, Data Scientist, GenAI Specialist\n"
+        "💼 *Experience*: AI/ML Engineer, GenAI Specialist\n"
         "🚀 *Key Projects*: VaradGPT Bot, DocMind, BookSense, and more.\n\n"
         "For full details, see my attached resume.\n"
-        "🔗 [Website](https://varadpensalwar.github.io/)\n"
+        "🔗 [Website](https://varadpensalwar.vercel.app/)\n"
         "🔗 [GitHub](https://github.com/Varadpensalwar)\n"
         "🔗 [LinkedIn](https://www.linkedin.com/in/varadpensalwar/)\n"
         "🔗 [Twitter](https://twitter.com/PensalwarVarad)\n"
@@ -488,7 +488,7 @@ async def send_resume_natural(message: types.Message):
 async def send_owner_info(message: types.Message):
     await message.reply(
         "Varad Pensalwar is the owner, creator, and maintainer of this bot and several other AI projects.\n\n"
-        "🔗 [Website](https://varadpensalwar.github.io/)\n"
+        "🔗 [Website](https://varadpensalwar.vercel.app/)\n"
         "🔗 [GitHub](https://github.com/Varadpensalwar)\n"
         "🔗 [LinkedIn](https://www.linkedin.com/in/varadpensalwar/)\n"
         "🔗 [Twitter](https://twitter.com/PensalwarVarad)\n"
@@ -503,8 +503,8 @@ async def send_owner_info(message: types.Message):
 ))
 async def send_varad_info_intent(message: types.Message):
     await message.reply(
-        "Varad Pensalwar is an AI/ML Engineer, Data Scientist, and GenAI Specialist from Pune, India. He is passionate about building intelligent systems that transform reality. Varad is the creator and maintainer of this bot and several other AI projects.\n\n"
-        "🔗 [Website](https://varadpensalwar.github.io/)\n"
+        "Varad Pensalwar is an AI/ML Engineer and GenAI Specialist from Pune, India. He is passionate about building intelligent systems that transform reality. Varad is the creator and maintainer of this bot and several other AI projects.\n\n"
+        "🔗 [Website](https://varadpensalwar.vercel.app/)\n"
         "🔗 [GitHub](https://github.com/Varadpensalwar)\n"
         "🔗 [LinkedIn](https://www.linkedin.com/in/varadpensalwar/)\n"
         "🔗 [Twitter](https://twitter.com/PensalwarVarad)\n"
@@ -550,9 +550,9 @@ qa_pairs = {
     "favorite way to learn new things": "I love learning from official documentation—it's the most reliable source!",
     "favorite ai use case": "I love using AI for solving bugs and making development smoother.",
     "favorite thing about being an ai/ml engineer": "Watching code transform raw data into intelligent insights that nobody has ever seen before is the best part of being an AI/ML engineer.",
-    "website": "🔗 [Website](https://varadpensalwar.github.io/)",
-    "portfolio": "You can explore my portfolio and learn more about me at 🔗 [Website](https://varadpensalwar.github.io/)",
-    "personal website": "My personal website is 🔗 [Website](https://varadpensalwar.github.io/)",
+    "website": "🔗 [Website](https://varadpensalwar.vercel.app/)",
+    "portfolio": "You can explore my portfolio and learn more about me at 🔗 [Website](https://varadpensalwar.vercel.app/)",
+    "personal website": "My personal website is 🔗 [Website](https://varadpensalwar.vercel.app/)",
 }
 
 def is_varad_qa_question(m):
@@ -573,8 +573,8 @@ async def send_varad_qa(message: types.Message):
     if score >= 80:
         answer = qa_pairs[best_q]
         # If the question is about portfolio, website, or background, append the website link if not present
-        if best_q in ["portfolio", "website", "personal website", "background", "about", "bio"] and "varadpensalwar.github.io" not in answer:
-            answer += "\n🔗 [Website](https://varadpensalwar.github.io/)"
+        if best_q in ["portfolio", "website", "personal website", "background", "about", "bio"] and "varadpensalwar.vercel.app" not in answer:
+            answer += "\n🔗 [Website](https://varadpensalwar.vercel.app/)"
         await message.reply(answer)
 
 # Contact Card Handler (robust, typo-tolerant, intent-based)
@@ -600,7 +600,7 @@ def is_contact_request(m):
 async def send_contact_intent(message: types.Message):
     contact_text = (
         "Here's how you can connect with Varad Pensalwar:\n\n"
-        "🔗 [Website](https://varadpensalwar.github.io/)\n"
+        "🔗 [Website](https://varadpensalwar.vercel.app/)\n"
         "🔗 [GitHub](https://github.com/Varadpensalwar)\n"
         "🔗 [LinkedIn](https://www.linkedin.com/in/varadpensalwar/)\n"
         "🔗 [Twitter](https://twitter.com/PensalwarVarad)\n"
@@ -625,7 +625,7 @@ async def send_resume_intent(message: types.Message):
 async def send_contact(message: types.Message):
     contact_text = (
         "Here's how you can connect with Varad Pensalwar:\n\n"
-        "🔗 [Website](https://varadpensalwar.github.io/)\n"
+        "🔗 [Website](https://varadpensalwar.vercel.app/)\n"
         "🔗 [GitHub](https://github.com/Varadpensalwar)\n"
         "🔗 [LinkedIn](https://www.linkedin.com/in/varadpensalwar/)\n"
         "🔗 [Twitter](https://twitter.com/PensalwarVarad)\n"
@@ -639,7 +639,7 @@ async def send_contact(message: types.Message):
 @router.message(Command("website"))
 async def send_website(message: types.Message):
     await message.reply(
-        "🔗 Varad Pensalwar's personal website/portfolio:\n🔗 [Website](https://varadpensalwar.github.io/)",
+        "🔗 Varad Pensalwar's personal website/portfolio:\n🔗 [Website](https://varadpensalwar.vercel.app/)",
         parse_mode="Markdown"
     )
 
@@ -726,8 +726,8 @@ async def handle_bot_specific_query(message, user_text, user_id):
     ]
     if any(kw in user_text for kw in creator_keywords):
         await message.reply(
-            "I was created and maintained by Varad Pensalwar (AI/ML Engineer, Data Scientist, GenAI Specialist).\n"
-            "🔗 [Website](https://varadpensalwar.github.io/)\n"
+            "I was created and maintained by Varad Pensalwar (AI/ML Engineer and GenAI Specialist).\n"
+            "🔗 [Website](https://varadpensalwar.vercel.app/)\n"
             "🔗 GitHub: https://github.com/Varadpensalwar\n"
             "🔗 LinkedIn: https://www.linkedin.com/in/varadpensalwar/\n"
             "🔗 Twitter: https://twitter.com/PensalwarVarad"
@@ -857,7 +857,7 @@ async def handle_bot_specific_query(message, user_text, user_id):
                       "expertise", "specialization", "speciality", "what can you do", "what are you good at", "what do you know"]
     if any(kw in user_text for kw in skills_keywords):
         await message.reply(
-            "I'm Varad Pensalwar, an AI/ML Engineer, Data Scientist, and GenAI Specialist.\n"
+            "I'm Varad Pensalwar, an AI/ML Engineer and GenAI Specialist.\n"
             "My expertise includes: Machine Learning, Deep Learning (CNNs, RNNs, Transformers, GANs), Generative AI (LLMs, Diffusion Models), Computer Vision, NLP, Agentic AI, MLOps, and more.\n"
             "I work with Python, R, SQL, TensorFlow, PyTorch, HuggingFace, LangChain, FastAPI, Docker, and more.\n\n"
             "See my full profile and projects:\n"
@@ -873,7 +873,7 @@ async def handle_bot_specific_query(message, user_text, user_id):
     if any(kw in user_text for kw in contact_keywords):
         await message.reply(
             "You can connect with Varad Pensalwar here:\n"
-            "🔗 [Website](https://varadpensalwar.github.io/)\n"
+            "🔗 [Website](https://varadpensalwar.vercel.app/)\n"
             "🔗 [GitHub](https://github.com/Varadpensalwar)\n"
             "🔗 [LinkedIn](https://www.linkedin.com/in/varadpensalwar/)\n"
             "🔗 [Twitter](https://twitter.com/PensalwarVarad)\n"
@@ -909,8 +909,8 @@ async def handle_bot_specific_query(message, user_text, user_id):
     ]
     if any(kw in user_text for kw in varad_keywords):
         await message.reply(
-            "Varad Pensalwar is an AI/ML Engineer, Data Scientist, and GenAI Specialist from Pune, India. He is passionate about building intelligent systems that transform reality. Varad is the creator and maintainer of this bot and several other AI projects.\n\n"
-            "🔗 [Website](https://varadpensalwar.github.io/)\n"
+            "Varad Pensalwar is an AI/ML Engineer and GenAI Specialist from Pune, India. He is passionate about building intelligent systems that transform reality. Varad is the creator and maintainer of this bot and several other AI projects.\n\n"
+            "🔗 [Website](https://varadpensalwar.vercel.app/)\n"
             "🔗 [GitHub](https://github.com/Varadpensalwar)\n"
             "🔗 [LinkedIn](https://www.linkedin.com/in/varadpensalwar/)\n"
             "🔗 [Twitter](https://twitter.com/PensalwarVarad)\n"
