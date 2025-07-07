@@ -27,6 +27,9 @@ print("DEBUG: openai.api_key =", openai.api_key, "TELEGRAM_BOT_TOKEN =", TELEGRA
 if not openai.api_key or not TELEGRAM_BOT_TOKEN:
     raise RuntimeError("OPENAI_API_KEY and TELEGRAM_BOT_TOKEN must be set in environment variables.")
 
+# Initialize OpenAI client
+client = openai.OpenAI(api_key=openai.api_key)
+
 
 class Reference:
     '''
@@ -39,7 +42,7 @@ class Reference:
 
 
 reference = Reference()
-model_name = "gpt-4.1-nano"
+model_name = "gpt-4o-mini"
 
 
 
@@ -297,11 +300,11 @@ async def handle_voice(message: types.Message):
     transcription = None
     try:
         with open(ogg_path, 'rb') as audio_file:
-            transcript_resp = openai.Audio.transcribe("whisper-1", audio_file)
-            if isinstance(transcript_resp, dict):
-                transcription = transcript_resp.get('text', '')
-            else:
-                transcription = ''
+            transcript_resp = client.audio.transcriptions.create(
+                model="whisper-1",
+                file=audio_file
+            )
+            transcription = transcript_resp.text
     except Exception as e:
         await message.reply("Sorry, I couldn't transcribe your voice message.")
         os.remove(ogg_path)
@@ -312,25 +315,22 @@ async def handle_voice(message: types.Message):
     prev_response = reference.response if reference.response else ""
     try:
         safe_text = transcription if isinstance(transcription, str) else ""
-        response = openai.ChatCompletion.create(
+        response = client.chat.completions.create(
             model = model_name,
             messages = [
                 {"role": "assistant", "content": prev_response},
                 {"role": "user", "content": safe_text + "\nPlease answer in English."}
             ]
         )
-        if isinstance(response, dict) and 'choices' in response and response['choices']:
-            chatgpt_reply = response['choices'][0]['message']['content']
-        else:
-            await message.reply("Sorry, I couldn't get a valid response from ChatGPT.")
-            return
+        chatgpt_reply = response.choices[0].message.content
+        if chatgpt_reply:
+            reference.response = chatgpt_reply
+        print(f">>> chatGPT: \n\t{reference.response}")
+        await bot.send_message(chat_id = message.chat.id, text = reference.response)
     except Exception as e:
         await message.reply("Sorry, I couldn't get a response from ChatGPT.")
         print(f"OpenAI error: {e}")
         return
-    reference.response = chatgpt_reply
-    print(f">>> chatGPT: \n\t{reference.response}")
-    await bot.send_message(chat_id = message.chat.id, text = reference.response)
 
 # --- User timezone storage ---
 USER_TZ_FILE = 'user_timezones.json'
@@ -635,11 +635,50 @@ async def chatgpt(message: types.Message):
     if user_id is None:
         await message.reply("User not found.")
         return
+    
     # Track usage count (session only)
     user_usage_count[user_id] = user_usage_count.get(user_id, 0) + 1
     user_text = message.text.lower() if message.text else ""
-    # Fuzzy typo-tolerant resume/CV/portfolio handler (rapidfuzz)
-    # (pip install rapidfuzz)
+    
+    # Check if this is a bot-specific query first
+    if is_bot_specific_query(user_text):
+        await handle_bot_specific_query(message, user_text, user_id)
+        return
+    
+    # If not a bot-specific query, use LLM for general questions
+    await handle_general_question(message, user_id)
+
+def is_bot_specific_query(user_text):
+    """Check if the query is specifically about the bot, Varad, or bot features"""
+    
+    # Bot-specific keywords
+    bot_keywords = [
+        # Varad/owner related
+        "varad", "pensalwar", "owner", "creator", "developer", "founder", "admin", "maintainer",
+        "who made", "who built", "who created", "who developed", "who is behind",
+        
+        # Bot features
+        "my birthday", "my timezone", "my name", "my user id", "my language", "usage count",
+        "what is my", "when is my", "how many times",
+        
+        # Commands and features
+        "resume", "cv", "portfolio", "contact", "website", "project", "projects",
+        "skills", "tech stack", "expertise", "about varad", "about you",
+        
+        # Greetings
+        "hi", "hello", "hey", "greetings", "good morning", "good afternoon", "good evening", "namaste", "yo", "sup",
+        
+        # Time/date queries (bot handles these)
+        "what time", "current time", "time is it", "what date", "current date", "date is it", "today", "day is it",
+        "my timezone is"
+    ]
+    
+    return any(keyword in user_text for keyword in bot_keywords)
+
+async def handle_bot_specific_query(message, user_text, user_id):
+    """Handle queries specifically about the bot, Varad, or bot features"""
+    
+    # Resume/CV/Portfolio handlers
     resume_keywords = [
         "resume", "cv", "curriculum vitae", "portfolio", "profile", "bio", "background",
         "experience", "education", "journey", "career", "work"
@@ -648,8 +687,10 @@ async def chatgpt(message: types.Message):
         "varad", "pensalwar", "your", "you", "bot", "owner", "admin", "creator",
         "author", "maintainer", "developer", "founder"
     ]
+    
     def fuzzy_in(text, keywords, threshold=85):
         return any(fuzz.partial_ratio(text, kw) >= threshold for kw in keywords)
+    
     user_text_words = user_text.split()
     for word in user_text_words:
         if fuzzy_in(word, resume_keywords) and any(ctx in user_text for ctx in context_keywords):
@@ -658,9 +699,15 @@ async def chatgpt(message: types.Message):
         if fuzzy_in(word, context_keywords) and any(rk in user_text for rk in resume_keywords):
             await send_resume(message)
             return
-    # --- Custom creator/owner handler (expanded) ---
+    
+    # Creator/owner handler
     creator_keywords = [
-        "who made", "who build", "who built", "who is your creator", "who is your developer", "who is your founder", "who is your owner", "who is your maker", "who is behind you", "who created you", "who is the author", "who programmed you", "who is responsible for you", "who is varadgpt's creator", "who is the person behind this bot", "who is the maintainer", "who is the admin", "who is the mastermind", "who is the architect", "who is the engineer", "who is the builder", "who developed you"
+        "who made", "who build", "who built", "who is your creator", "who is your developer", 
+        "who is your founder", "who is your owner", "who is your maker", "who is behind you", 
+        "who created you", "who is the author", "who programmed you", "who is responsible for you", 
+        "who is varadgpt's creator", "who is the person behind this bot", "who is the maintainer", 
+        "who is the admin", "who is the mastermind", "who is the architect", "who is the engineer", 
+        "who is the builder", "who developed you"
     ]
     if any(kw in user_text for kw in creator_keywords):
         await message.reply(
@@ -671,18 +718,16 @@ async def chatgpt(message: types.Message):
             "🔗 Twitter: https://twitter.com/PensalwarVarad"
         )
         return
-    # --- Time/Date Q&A: always reply with no real-time access ---
-    if any(kw in user_text for kw in ["what time", "current time", "time is it", "what date", "current date", "date is it", "today", "day is it"]):
-        await message.reply("As a bot, I do not have real-time access to date and time. You can check it on your device or preferred source.")
-        return
-    # --- Timezone setup: user says 'my timezone is <city/country>' ---
+    
+    # Timezone setup
     if user_text.startswith("my timezone is "):
         location = user_text.replace("my timezone is ", "").strip()
         user_cities[str(user_id)] = location
         save_user_cities()
         await message.reply(f"Your city/timezone has been set to: {location}")
         return
-    # --- Time/Date Q&A ---
+    
+    # Time/Date queries
     time_city_match = re.search(r'what time is it in ([\w\s,\-]+)\??', user_text)
     date_city_match = re.search(r'what day is it in ([\w\s,\-]+)\??', user_text)
     city = None
@@ -692,7 +737,7 @@ async def chatgpt(message: types.Message):
         city = date_city_match.group(1).strip()
     else:
         city = user_cities.get(str(user_id))
-    # Handle 'what is my timezone' and 'what is today' and 'what day is it'
+    
     if ("what is my timezone" in user_text or "my timezone" in user_text or
         "what is today" in user_text or "what day is it" in user_text or
         time_city_match or date_city_match):
@@ -704,7 +749,6 @@ async def chatgpt(message: types.Message):
             if "time" in user_text:
                 await message.reply(f"The current time in {zone_name} is {time_str} (GMT offset: {gmt_offset})")
             else:
-                # Only date part
                 if isinstance(time_str, str):
                     date_part = time_str.split()[0]
                     await message.reply(f"Today in {zone_name} is {date_part}")
@@ -713,7 +757,8 @@ async def chatgpt(message: types.Message):
         else:
             await message.reply("Sorry, I couldn't get the current time for that city/timezone. Please check the city name or try another.")
         return
-    # --- Personal Q&A ---
+    
+    # Personal Q&A
     if any(kw in user_text for kw in ["when is my birthday", "what is my birthday", "birthday date", "my birthday", "birthday?"]):
         bday = user_birthdays.get(str(user_id))
         if bday:
@@ -721,6 +766,7 @@ async def chatgpt(message: types.Message):
         else:
             await message.reply("I don't know your birthday yet. Please set it using /birthday DD-MM (e.g., /birthday 15-08)")
         return
+    
     if "what is my name" in user_text or "who am i" in user_text:
         user = getattr(message, 'from_user', None)
         first_name = getattr(user, 'first_name', '')
@@ -731,6 +777,7 @@ async def chatgpt(message: types.Message):
             full_name = first_name
         await message.reply(f"Your name is {full_name}.")
         return
+    
     if "what is my timezone" in user_text or "my timezone" in user_text:
         user = getattr(message, 'from_user', None)
         lang_code = getattr(user, 'language_code', None)
@@ -742,20 +789,22 @@ async def chatgpt(message: types.Message):
         if dt_str:
             await message.reply(f"Your timezone is: {tz}\nCurrent local time: {dt_str}")
         else:
-            # Fallback to local calculation
             tz = pytz.timezone(tz_name)
             now = datetime.now(tz)
             await message.reply(f"Your timezone is: {tz_name}\nCurrent local time: {now.strftime('%A, %d %B %Y %H:%M:%S')}")
         return
+    
     if "what is my language" in user_text or "my language" in user_text:
         user = getattr(message, 'from_user', None)
         lang_code = getattr(user, 'language_code', None)
         lang = get_lang(user_id)
         await message.reply(f"Your Telegram language code is: {lang_code}\nThe bot is currently using: {lang}")
         return
-    if "what is my user id" in user_text or "my user id" in user_text or "who am i" in user_text:
+    
+    if "what is my user id" in user_text or "my user id" in user_text:
         await message.reply(f"Your Telegram user ID is: {user_id}")
         return
+    
     if "what is today" in user_text or "what day is it" in user_text:
         user = getattr(message, 'from_user', None)
         lang_code = getattr(user, 'language_code', None)
@@ -767,25 +816,30 @@ async def chatgpt(message: types.Message):
         if dt_str:
             await message.reply(f"Today is {dt_str.split()[0]}, {dt_str.split()[1]} {dt_str.split()[2]} {dt_str.split()[3]} (your timezone: {tz})")
         else:
-            # Fallback to local calculation
             tz = pytz.timezone(tz_name)
             now = datetime.now(tz)
             await message.reply(f"Today is {now.strftime('%A, %d %B %Y')} (your timezone: {tz_name})")
         return
+    
     if "how many times have i used" in user_text or "usage count" in user_text or "how many times" in user_text:
         count = user_usage_count.get(user_id, 1)
         await message.reply(f"You have used this bot {count} times in this session.")
         return
-    # --- Project info phrase handler (very broad/contextual) ---
+    
+    # Project info handler
     project_keywords = ["project", "projects"]
     context_keywords = [
-        "your", "you", "varad", "bot", "about", "show", "list", "tell", "demo", "work", "portfolio", "created", "built", "developed", "made", "feature", "featuring", "examples", "sample", "my", "our", "owner", "author", "maintainer"
+        "your", "you", "varad", "bot", "about", "show", "list", "tell", "demo", "work", "portfolio", 
+        "created", "built", "developed", "made", "feature", "featuring", "examples", "sample", 
+        "my", "our", "owner", "author", "maintainer"
     ]
     if any(pk in user_text for pk in project_keywords) and any(ck in user_text for ck in context_keywords):
         await project_info(message)
         return
-    # --- Skills/tech stack/expertise handler ---
-    skills_keywords = ["skills", "tech stack", "technology", "technologies", "languages", "tools", "expertise", "specialization", "speciality", "what can you do", "what are you good at", "what do you know"]
+    
+    # Skills/tech stack handler
+    skills_keywords = ["skills", "tech stack", "technology", "technologies", "languages", "tools", 
+                      "expertise", "specialization", "speciality", "what can you do", "what are you good at", "what do you know"]
     if any(kw in user_text for kw in skills_keywords):
         await message.reply(
             "I'm Varad Pensalwar, an AI/ML Engineer, Data Scientist, and GenAI Specialist.\n"
@@ -797,8 +851,10 @@ async def chatgpt(message: types.Message):
             "🔗 [Twitter](https://twitter.com/PensalwarVarad)"
         )
         return
-    # --- Contact/social handler ---
-    contact_keywords = ["contact", "connect", "reach", "email", "social", "how to contact", "how to reach", "how to connect", "get in touch"]
+    
+    # Contact/social handler
+    contact_keywords = ["contact", "connect", "reach", "email", "social", "how to contact", 
+                       "how to reach", "how to connect", "get in touch"]
     if any(kw in user_text for kw in contact_keywords):
         await message.reply(
             "You can connect with Varad Pensalwar here:\n"
@@ -809,8 +865,10 @@ async def chatgpt(message: types.Message):
             "Or email: varadpensalwar@gmail.com"
         )
         return
-    # --- Friendly greeting fallback ---
-    greeting_keywords = ["hi", "hello", "hey", "greetings", "good morning", "good afternoon", "good evening", "namaste", "yo", "sup"]
+    
+    # Greeting handler
+    greeting_keywords = ["hi", "hello", "hey", "greetings", "good morning", "good afternoon", 
+                        "good evening", "namaste", "yo", "sup"]
     if any(greet in user_text for greet in greeting_keywords):
         await message.reply(
             "Hello! 👋 I'm VaradGPT Bot, your personal AI assistant.\n"
@@ -818,12 +876,21 @@ async def chatgpt(message: types.Message):
             "Try commands like /about or /project, or just ask in your own words!"
         )
         return
-    # --- Owner/about Varad handler (very broad) ---
+    
+    # About Varad handler
     varad_keywords = [
-        "who is varad", "tell me about varad", "about varad", "varad pensalwar", "who is varad pensalwar", "varad's profile", "varad's bio", "varad's background", "varad's info",
-        "who are you", "who is the owner", "who is the admin", "who is the founder", "who is the mastermind", "who is the genius behind this", "who is the architect", "who is the engineer", "who is the builder", "who maintains this bot", "who runs this bot", "who is behind this bot", "who is the person behind this bot", "who is the creator of this bot", "who is the author of this bot", "who developed this bot",
-        "who is varadgpt", "varadgpt owner", "varadgpt creator", "varadgpt admin", "varadgpt author", "varadgpt maintainer", "varadgpt developer", "varadgpt founder", "varadgpt background", "varadgpt bio", "varadgpt info",
-        "who made this bot", "who built this bot", "who is responsible for this bot", "who is the genius behind varadgpt", "who is the mastermind behind varadgpt", "who is the developer of varadgpt", "who is the engineer of varadgpt", "who is the architect of varadgpt", "who is the admin of varadgpt", "who is the maintainer of varadgpt", "who is the owner of varadgpt", "who is the founder of varadgpt", "who is the creator of varadgpt"
+        "who is varad", "tell me about varad", "about varad", "varad pensalwar", "who is varad pensalwar", 
+        "varad's profile", "varad's bio", "varad's background", "varad's info",
+        "who are you", "who is the owner", "who is the admin", "who is the founder", "who is the mastermind", 
+        "who is the genius behind this", "who is the architect", "who is the engineer", "who is the builder", 
+        "who maintains this bot", "who runs this bot", "who is behind this bot", "who is the person behind this bot", 
+        "who is the creator of this bot", "who is the author of this bot", "who developed this bot",
+        "who is varadgpt", "varadgpt owner", "varadgpt creator", "varadgpt admin", "varadgpt author", 
+        "varadgpt maintainer", "varadgpt developer", "varadgpt founder", "varadgpt background", "varadgpt bio", "varadgpt info",
+        "who made this bot", "who built this bot", "who is responsible for this bot", "who is the genius behind varadgpt", 
+        "who is the mastermind behind varadgpt", "who is the developer of varadgpt", "who is the engineer of varadgpt", 
+        "who is the architect of varadgpt", "who is the admin of varadgpt", "who is the maintainer of varadgpt", 
+        "who is the owner of varadgpt", "who is the founder of varadgpt", "who is the creator of varadgpt"
     ]
     if any(kw in user_text for kw in varad_keywords):
         await message.reply(
@@ -835,48 +902,50 @@ async def chatgpt(message: types.Message):
             "✉️ Email: varadpensalwar@gmail.com\n"
         )
         return
-    # --- Resume/CV/Portfolio handler (maximally flexible) ---
+    
+    # Resume/CV/Portfolio handler
     resume_words = [
-        "resume", "cv", "curriculum vitae", "portfolio", "profile", "bio", "background", "experience", "education", "journey", "career", "work"
+        "resume", "cv", "curriculum vitae", "portfolio", "profile", "bio", "background", 
+        "experience", "education", "journey", "career", "work"
     ]
     context_words = [
-        "varad", "pensalwar", "your", "you", "bot", "owner", "admin", "creator", "author", "maintainer", "developer", "founder"
+        "varad", "pensalwar", "your", "you", "bot", "owner", "admin", "creator", 
+        "author", "maintainer", "developer", "founder"
     ]
     if any(rw in user_text for rw in resume_words) and any(cw in user_text for cw in context_words):
         await send_resume(message)
         return
-    # --- Resume/CV/Portfolio handler (ultra-flexible, regex-based, fallback) ---
-    for rword in resume_words:
-        for cword in context_words:
-            pattern = rf"{rword}(?:\W+\w+){{0,5}}\W+{cword}|{cword}(?:\W+\w+){{0,5}}\W+{rword}"
-            if re.search(pattern, user_text):
-                await send_resume(message)
-        return
+    
+    # If none of the above, it should have been handled by LLM
+    # This should not be reached, but just in case
+    await handle_general_question(message, user_id)
+
+async def handle_general_question(message, user_id):
+    """Handle general questions using the LLM"""
     prev_response = reference.response if reference.response else ""
     safe_text = message.text if isinstance(message.text, str) else ""
+    
     if not safe_text.strip():
         await message.reply("Please send a valid message.")
         return
+    
     try:
-        response = openai.ChatCompletion.create(
+        response = client.chat.completions.create(
             model = model_name,
             messages = [
                 {"role": "assistant", "content": prev_response},
                 {"role": "user", "content": safe_text + "\nPlease answer in English."}
             ]
         )
-        if isinstance(response, dict) and 'choices' in response and response['choices']:
-            chatgpt_reply = response['choices'][0]['message']['content']
-        else:
-            await message.reply("Sorry, I couldn't get a valid response from ChatGPT.")
-            return
+        chatgpt_reply = response.choices[0].message.content
+        if chatgpt_reply:
+            reference.response = chatgpt_reply
+        print(f">>> chatGPT: \n\t{reference.response}")
+        await bot.send_message(chat_id = message.chat.id, text = reference.response)
     except Exception as e:
         await message.reply("Sorry, I couldn't get a response from ChatGPT.")
         print(f"OpenAI error: {e}")
         return
-    reference.response = chatgpt_reply
-    print(f">>> chatGPT: \n\t{reference.response}")
-    await bot.send_message(chat_id = message.chat.id, text = reference.response)
 
 # Register the router in the dispatcher
 async def on_startup(dispatcher: Dispatcher):
