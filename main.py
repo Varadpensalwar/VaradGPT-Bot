@@ -30,6 +30,12 @@ if not openai.api_key or not TELEGRAM_BOT_TOKEN:
 # Initialize OpenAI client
 client = openai.OpenAI(api_key=openai.api_key)
 
+# Safe getters (moved to top to avoid undefined errors)
+def safe_user_id(message):
+    return getattr(getattr(message, 'from_user', None), 'id', None)
+def safe_full_name(message):
+    return getattr(getattr(message, 'from_user', None), 'full_name', "Unknown")
+
 
 class Reference:
     '''
@@ -314,12 +320,12 @@ async def handle_voice(message: types.Message):
     # Send transcription to ChatGPT
     prev_response = reference.response if reference.response else ""
     try:
-    safe_text = transcription if isinstance(transcription, str) else ""
-    response = client.chat.completions.create(
-        model = model_name,
-        messages = [
-            {"role": "assistant", "content": prev_response},
-            {"role": "user", "content": f"""{safe_text}
+        safe_text = transcription if isinstance(transcription, str) else ""
+        response = client.chat.completions.create(
+            model = model_name,
+            messages = [
+                {"role": "assistant", "content": prev_response},
+                {"role": "user", "content": f"""{safe_text}
 
 Please provide a helpful, clear, and engaging response in English. Follow these guidelines:
 - Keep your response to 2 concise paragraphs maximum
@@ -329,17 +335,17 @@ Please provide a helpful, clear, and engaging response in English. Follow these 
 - If the topic is complex, focus on the most important points
 - Use examples or analogies if they help clarify your explanation
 - Avoid unnecessary jargon or overly technical language unless specifically requested"""}
-        ]
-    )
-    chatgpt_reply = response.choices[0].message.content
-    if chatgpt_reply:
-        reference.response = chatgpt_reply
-    print(f">>> chatGPT: \n\t{reference.response}")
-    await bot.send_message(chat_id = message.chat.id, text = reference.response)
-except Exception as e:
-    await message.reply("Sorry, I couldn't get a response from ChatGPT.")
-    print(f"OpenAI error: {e}")
-    return
+            ]
+        )
+        chatgpt_reply = response.choices[0].message.content
+        if chatgpt_reply:
+            reference.response = chatgpt_reply
+        print(f">>> chatGPT: \n\t{reference.response}")
+        await bot.send_message(chat_id = message.chat.id, text = reference.response)
+    except Exception as e:
+        await message.reply("Sorry, I couldn't get a response from ChatGPT.")
+        print(f"OpenAI error: {e}")
+        return
 
 # --- User timezone storage ---
 USER_TZ_FILE = 'user_timezones.json'
@@ -974,12 +980,6 @@ async def set_bot_commands(bot: Bot):
         BotCommand(command="clear", description="Clear conversation/context"),
     ]
     await bot.set_my_commands(commands)
-
-# Safe getters
-def safe_user_id(message):
-    return getattr(getattr(message, 'from_user', None), 'id', None)
-def safe_full_name(message):
-    return getattr(getattr(message, 'from_user', None), 'full_name', "Unknown")
 
 if __name__ == "__main__":
     async def main():
