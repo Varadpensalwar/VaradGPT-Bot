@@ -314,23 +314,32 @@ async def handle_voice(message: types.Message):
     # Send transcription to ChatGPT
     prev_response = reference.response if reference.response else ""
     try:
-        safe_text = transcription if isinstance(transcription, str) else ""
-        response = client.chat.completions.create(
-            model = model_name,
-            messages = [
-                {"role": "assistant", "content": prev_response},
-                {"role": "user", "content": safe_text + "\nPlease answer in English."}
-            ]
-        )
-        chatgpt_reply = response.choices[0].message.content
-        if chatgpt_reply:
-            reference.response = chatgpt_reply
-        print(f">>> chatGPT: \n\t{reference.response}")
-        await bot.send_message(chat_id = message.chat.id, text = reference.response)
-    except Exception as e:
-        await message.reply("Sorry, I couldn't get a response from ChatGPT.")
-        print(f"OpenAI error: {e}")
-        return
+    safe_text = transcription if isinstance(transcription, str) else ""
+    response = client.chat.completions.create(
+        model = model_name,
+        messages = [
+            {"role": "assistant", "content": prev_response},
+            {"role": "user", "content": f"""{safe_text}
+
+Please provide a helpful, clear, and engaging response in English. Follow these guidelines:
+- Keep your response to 2 concise paragraphs maximum
+- Be conversational and natural in tone
+- Directly address the user's question or topic
+- Provide specific, actionable information when possible
+- If the topic is complex, focus on the most important points
+- Use examples or analogies if they help clarify your explanation
+- Avoid unnecessary jargon or overly technical language unless specifically requested"""}
+        ]
+    )
+    chatgpt_reply = response.choices[0].message.content
+    if chatgpt_reply:
+        reference.response = chatgpt_reply
+    print(f">>> chatGPT: \n\t{reference.response}")
+    await bot.send_message(chat_id = message.chat.id, text = reference.response)
+except Exception as e:
+    await message.reply("Sorry, I couldn't get a response from ChatGPT.")
+    print(f"OpenAI error: {e}")
+    return
 
 # --- User timezone storage ---
 USER_TZ_FILE = 'user_timezones.json'
@@ -934,7 +943,7 @@ async def handle_general_question(message, user_id):
             model = model_name,
             messages = [
                 {"role": "assistant", "content": prev_response},
-                {"role": "user", "content": safe_text + "\nPlease answer in English."}
+                {"role": "user", "content": safe_text + "\nPlease answer in English. Limit your response to no more than two concise paragraphs."}
             ]
         )
         chatgpt_reply = response.choices[0].message.content
