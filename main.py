@@ -882,9 +882,15 @@ async def handle_bot_specific_query(message, user_text, user_id):
         return
     
     # Greeting handler
-    greeting_keywords = ["hi", "hello", "hey", "greetings", "good morning", "good afternoon", 
-                        "good evening", "namaste", "yo", "sup"]
-    if any(greet in user_text for greet in greeting_keywords):
+    greeting_keywords = [
+        "hi", "hello", "hey", "greetings", "good morning", "good afternoon", 
+        "good evening", "namaste", "yo", "sup"
+    ]
+    greeting_pattern = re.compile(
+        r"^\s*(" + "|".join(re.escape(greet) for greet in greeting_keywords) + r")[\s!.,]*$",
+        re.IGNORECASE
+    )
+    if greeting_pattern.match(user_text):
         await message.reply(
             "Hello! 👋 I'm VaradGPT Bot, your personal AI assistant.\n"
             "You can ask me about Varad's projects, skills, or how to contact him.\n"
