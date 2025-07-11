@@ -451,6 +451,7 @@ async def set_city(message: types.Message):
 # Move these handlers above the catch-all
 @router.message(Command("resume"))
 async def send_resume(message: types.Message):
+    import os
     summary = (
         "*Varad Pensalwar – Resume Summary*\n\n"
         "🎓 *Education*: B.Tech in Artificial Intelligence & Machine Learning, Sanjay Ghodawat University, Kolhapur\n"
@@ -464,7 +465,16 @@ async def send_resume(message: types.Message):
         "✉️ Email: varadpensalwar@gmail.com\n"
     )
     await message.reply(summary, parse_mode="Markdown")
-    await message.reply_document(FSInputFile('Varad_Pensalwar_Resume.pdf'), caption="📄 Varad Pensalwar – Resume")
+    # Debug prints
+    cwd = os.getcwd()
+    file_exists = os.path.exists('Varad_Pensalwar_Resume.pdf')
+    print(f"[DEBUG] CWD: {cwd}")
+    print(f"[DEBUG] Resume file exists: {file_exists}")
+    try:
+        await message.reply_document(FSInputFile('Varad_Pensalwar_Resume.pdf'), caption="📄 Varad Pensalwar – Resume")
+    except Exception as e:
+        print(f"[ERROR] Failed to send resume: {e}")
+        await message.reply(f"Error sending resume: {e}\nCWD: {cwd}\nFile exists: {file_exists}")
 
 @router.message(Command("cv"))
 async def send_cv(message: types.Message):
