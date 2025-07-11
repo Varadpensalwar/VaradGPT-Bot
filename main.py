@@ -465,14 +465,18 @@ async def send_resume(message: types.Message):
         "✉️ Email: varadpensalwar@gmail.com\n"
     )
     await message.reply(summary, parse_mode="Markdown")
-    resume_path = os.path.join(os.path.dirname(__file__), 'Varad_Pensalwar_Resume.pdf')
-    try:
-        # Use bot.send_document for broader compatibility across aiogram versions
-        await bot.send_document(chat_id=message.chat.id, document=FSInputFile(resume_path, filename='Varad_Pensalwar_Resume.pdf'), caption="📄 Varad Pensalwar – Resume")
-    except Exception as e:
-        # Send a brief error message to the user and log to stdout for debugging
-        await message.reply("❌ Sorry, I couldn't send the resume right now.")
-        print(f"ERROR sending resume: {e} (path={resume_path})")
+    # Prefer a pre-uploaded file ID if provided to avoid file-system issues in some deployments
+    resume_file_id = os.getenv('RESUME_FILE_ID')
+    if resume_file_id:
+        await bot.send_document(chat_id=message.chat.id, document=resume_file_id, caption="📄 Varad Pensalwar – Resume")
+    else:
+        resume_path = os.path.join(os.path.dirname(__file__), 'Varad_Pensalwar_Resume.pdf')
+        # Send from local filesystem. Telegram identifies MIME type automatically.
+        await bot.send_document(
+            chat_id=message.chat.id,
+            document=FSInputFile(resume_path, filename='Varad_Pensalwar_Resume.pdf'),
+            caption="📄 Varad Pensalwar – Resume"
+        )
 
 @router.message(Command("cv"))
 async def send_cv(message: types.Message):
