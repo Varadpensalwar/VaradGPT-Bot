@@ -464,7 +464,7 @@ async def send_resume(message: types.Message):
         "✉️ Email: varadpensalwar@gmail.com\n"
     )
     await message.reply(summary, parse_mode="Markdown")
-    await message.reply_document(FSInputFile('Varad Resume.pdf'), caption="📄 Varad Pensalwar – Resume")
+    await message.reply_document(FSInputFile('Varad_Pensalwar_Resume.pdf'), caption="📄 Varad Pensalwar – Resume")
 
 @router.message(Command("cv"))
 async def send_cv(message: types.Message):
