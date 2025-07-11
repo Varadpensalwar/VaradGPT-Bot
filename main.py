@@ -471,7 +471,7 @@ async def send_resume(message: types.Message):
         await bot.send_document(chat_id=message.chat.id, document=resume_file_id, caption="📄 Varad Pensalwar – Resume")
     else:
         resume_path = os.path.join(os.path.dirname(__file__), 'Varad_Pensalwar_Resume.pdf')
-                with open(resume_path, "rb") as f:
+        with open(resume_path, "rb") as f:
             data = f.read()
         input_file = BufferedInputFile(data, filename="Varad_Pensalwar_Resume.pdf")
         await bot.send_document(
