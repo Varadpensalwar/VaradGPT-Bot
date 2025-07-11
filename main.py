@@ -466,7 +466,13 @@ async def send_resume(message: types.Message):
     )
     await message.reply(summary, parse_mode="Markdown")
     resume_path = os.path.join(os.path.dirname(__file__), 'Varad_Pensalwar_Resume.pdf')
-    await message.answer_document(FSInputFile(resume_path), caption="📄 Varad Pensalwar – Resume")
+    try:
+        # Use named parameter for clarity
+        await message.answer_document(document=FSInputFile(resume_path), caption="📄 Varad Pensalwar – Resume")
+    except Exception as e:
+        # Send a brief error message to the user and log to stdout for debugging
+        await message.reply("❌ Sorry, I couldn't send the resume right now.")
+        print(f"ERROR sending resume: {e} (path={resume_path})")
 
 @router.message(Command("cv"))
 async def send_cv(message: types.Message):
