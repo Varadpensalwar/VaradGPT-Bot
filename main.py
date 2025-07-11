@@ -471,14 +471,23 @@ async def send_resume(message: types.Message):
         await bot.send_document(chat_id=message.chat.id, document=resume_file_id, caption="📄 Varad Pensalwar – Resume")
     else:
         resume_path = os.path.join(os.path.dirname(__file__), 'Varad_Pensalwar_Resume.pdf')
-        with open(resume_path, "rb") as f:
-            data = f.read()
-        input_file = BufferedInputFile(data, filename="Varad_Pensalwar_Resume.pdf")
-        await bot.send_document(
-            chat_id=message.chat.id,
-            document=input_file,
-            caption="📄 Varad Pensalwar – Resume"
-        )
+        if os.path.exists(resume_path):
+            with open(resume_path, "rb") as f:
+                data = f.read()
+            input_file = BufferedInputFile(data, filename="Varad_Pensalwar_Resume.pdf")
+            await bot.send_document(
+                chat_id=message.chat.id,
+                document=input_file,
+                caption="📄 Varad Pensalwar – Resume"
+            )
+        else:
+            # Fallback to sending via URL (GitHub raw file or RESUME_URL env)
+            resume_url = os.getenv('RESUME_URL', 'https://raw.githubusercontent.com/Varadpensalwar/VaradGPT-Bot/main/Varad_Pensalwar_Resume.pdf')
+            await bot.send_document(
+                chat_id=message.chat.id,
+                document=resume_url,
+                caption="📄 Varad Pensalwar – Resume"
+            )
 
 @router.message(Command("cv"))
 async def send_cv(message: types.Message):
