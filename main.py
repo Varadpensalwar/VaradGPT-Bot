@@ -466,7 +466,7 @@ async def send_resume(message: types.Message):
     )
     await message.reply(summary, parse_mode="Markdown")
     resume_path = os.path.join(os.path.dirname(__file__), 'Varad_Pensalwar_Resume.pdf')
-    await message.reply_document(FSInputFile(resume_path), caption="📄 Varad Pensalwar – Resume")
+    await message.answer_document(FSInputFile(resume_path), caption="📄 Varad Pensalwar – Resume")
 
 @router.message(Command("cv"))
 async def send_cv(message: types.Message):
@@ -611,7 +611,7 @@ async def send_contact_intent(message: types.Message):
     await message.reply(contact_text, parse_mode="Markdown")
     vcard_path = "VaradPensalwar.vcf"
     if os.path.exists(vcard_path):
-        await message.reply_document(FSInputFile(vcard_path), caption="📇 Varad Pensalwar – vCard")
+        await message.answer_document(FSInputFile(vcard_path), caption="📇 Varad Pensalwar – vCard")
 
 # 1. Resume/CV/Portfolio Handler (add negative check for identity questions)
 @router.message(lambda m: isinstance(m.text, str) and (
@@ -636,7 +636,7 @@ async def send_contact(message: types.Message):
     await message.reply(contact_text, parse_mode="Markdown")
     vcard_path = "VaradPensalwar.vcf"
     if os.path.exists(vcard_path):
-        await message.reply_document(FSInputFile(vcard_path), caption="📇 Varad Pensalwar – vCard")
+        await message.answer_document(FSInputFile(vcard_path), caption="📇 Varad Pensalwar – vCard")
 
 @router.message(Command("website"))
 async def send_website(message: types.Message):
