@@ -465,16 +465,8 @@ async def send_resume(message: types.Message):
         "✉️ Email: varadpensalwar@gmail.com\n"
     )
     await message.reply(summary, parse_mode="Markdown")
-    # Debug prints
-    cwd = os.getcwd()
-    file_exists = os.path.exists('Varad_Pensalwar_Resume.pdf')
-    print(f"[DEBUG] CWD: {cwd}")
-    print(f"[DEBUG] Resume file exists: {file_exists}")
-    try:
-        await message.reply_document(FSInputFile('Varad_Pensalwar_Resume.pdf'), caption="📄 Varad Pensalwar – Resume")
-    except Exception as e:
-        print(f"[ERROR] Failed to send resume: {e}")
-        await message.reply(f"Error sending resume: {e}\nCWD: {cwd}\nFile exists: {file_exists}")
+    resume_path = os.path.join(os.path.dirname(__file__), 'Varad_Pensalwar_Resume.pdf')
+    await message.reply_document(FSInputFile(resume_path), caption="📄 Varad Pensalwar – Resume")
 
 @router.message(Command("cv"))
 async def send_cv(message: types.Message):
