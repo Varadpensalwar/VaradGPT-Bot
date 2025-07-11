@@ -468,7 +468,7 @@ async def send_resume(message: types.Message):
     resume_path = os.path.join(os.path.dirname(__file__), 'Varad_Pensalwar_Resume.pdf')
     try:
         # Use bot.send_document for broader compatibility across aiogram versions
-        await bot.send_document(chat_id=message.chat.id, document=FSInputFile(resume_path), caption="📄 Varad Pensalwar – Resume")
+        await bot.send_document(chat_id=message.chat.id, document=FSInputFile(resume_path, filename='Varad_Pensalwar_Resume.pdf'), caption="📄 Varad Pensalwar – Resume")
     except Exception as e:
         # Send a brief error message to the user and log to stdout for debugging
         await message.reply("❌ Sorry, I couldn't send the resume right now.")
@@ -617,7 +617,7 @@ async def send_contact_intent(message: types.Message):
     await message.reply(contact_text, parse_mode="Markdown")
     vcard_path = "VaradPensalwar.vcf"
     if os.path.exists(vcard_path):
-        await message.answer_document(FSInputFile(vcard_path), caption="📇 Varad Pensalwar – vCard")
+        await message.answer_document(FSInputFile(vcard_path, filename='VaradPensalwar.vcf'), caption="📇 Varad Pensalwar – vCard")
 
 # 1. Resume/CV/Portfolio Handler (add negative check for identity questions)
 @router.message(lambda m: isinstance(m.text, str) and (
@@ -642,7 +642,7 @@ async def send_contact(message: types.Message):
     await message.reply(contact_text, parse_mode="Markdown")
     vcard_path = "VaradPensalwar.vcf"
     if os.path.exists(vcard_path):
-        await message.answer_document(FSInputFile(vcard_path), caption="📇 Varad Pensalwar – vCard")
+        await message.answer_document(FSInputFile(vcard_path, filename='VaradPensalwar.vcf'), caption="📇 Varad Pensalwar – vCard")
 
 @router.message(Command("website"))
 async def send_website(message: types.Message):
