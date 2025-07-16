@@ -123,65 +123,8 @@ def get_timezone_from_lang_code(lang_code):
                 return tz
     return 'UTC'
 
-# --- Birthday storage ---
-BIRTHDAY_FILE = 'birthdays.json'
-if os.path.exists(BIRTHDAY_FILE):
-    with open(BIRTHDAY_FILE, 'r') as f:
-        user_birthdays = json.load(f)
-else:
-    user_birthdays = {}
 
-def save_birthdays():
-    with open(BIRTHDAY_FILE, 'w') as f:
-        json.dump(user_birthdays, f)
 
-# --- Festive greetings dictionary (expand as needed) ---
-FESTIVE_DAYS = {
-    'Asia/Kolkata': {
-        '01-01': '🎉 Happy New Year! 🎉',
-        '15-08': '🇮🇳 Happy Independence Day! 🇮🇳',
-        '25-12': '🎄 Merry Christmas! 🎄',
-    },
-    'America/New_York': {
-        '01-01': '🎉 Happy New Year! 🎉',
-        '04-07': '🇺🇸 Happy Independence Day! 🇺🇸',
-        '25-12': '🎄 Merry Christmas! 🎄',
-    },
-    'Europe/London': {
-        '01-01': '🎉 Happy New Year! 🎉',
-        '25-12': '🎄 Merry Christmas! 🎄',
-    },
-    # Add more as needed
-}
-
-# --- /birthday command handler ---
-@router.message(Command("birthday"))
-async def set_birthday(message: types.Message):
-    user_id = str(safe_user_id(message))
-    if not isinstance(message.text, str):
-        await message.reply("Could not read your message. Please use the format: /birthday DD-MM (e.g., /birthday 15-08)")
-        return
-    args = message.text.split()
-    if len(args) == 2:
-        bday = args[1]
-        # Validate format DD-MM
-        try:
-            day, month = map(int, bday.split('-'))
-            if 1 <= day <= 31 and 1 <= month <= 12:
-                user_birthdays[user_id] = bday
-                save_birthdays()
-                await message.reply(f"Your birthday has been set to {bday}. 🎂")
-                return
-        except Exception:
-            pass
-        await message.reply("Please use the format: /birthday DD-MM (e.g., /birthday 15-08)")
-    else:
-        # Show current birthday if set
-        bday = user_birthdays.get(user_id)
-        if bday:
-            await message.reply(f"Your birthday is set to {bday}. 🎂 To change it, use /birthday DD-MM")
-        else:
-            await message.reply("Please set your birthday using: /birthday DD-MM (e.g., /birthday 15-08)")
 
 # --- Update /start handler ---
 @router.message(Command("start"))
@@ -197,34 +140,11 @@ async def welcome(message: types.Message):
         full_name = f"{first_name} {last_name}"
     else:
         full_name = first_name
-    # Time-based greeting using user's language_code
-    lang_code = getattr(user, 'language_code', None)
-    tz_name = get_timezone_from_lang_code(lang_code)
-    tz = pytz.timezone(tz_name)
-    now = datetime.now(tz)
-    hour = now.hour
-    weekday = now.strftime('%A')
-    today_str = now.strftime('%d-%m')
-    # Birthday greeting
-    bday_greeting = None
-    if str(user_id) in user_birthdays and user_birthdays[str(user_id)] == today_str:
-        bday_greeting = f"🎂 Happy Birthday, {first_name}! 🎉\n"
-    # Festive greeting
-    festive_greeting = None
-    if tz_name in FESTIVE_DAYS and today_str in FESTIVE_DAYS[tz_name]:
-        festive_greeting = FESTIVE_DAYS[tz_name][today_str] + "\n"
     # Returning user check
     if user_id in user_seen:
         welcome_line = f"Welcome back, {first_name}!"
     else:
-        welcome_line = f"Welcome, {first_name}!"
-        user_seen.add(user_id)
-    greeting = (
-        f"{bday_greeting or ''}{festive_greeting or ''}{welcome_line} 👋\n"
-        "I'm VaradGPT Bot, your personal AI assistant.\n"
-        "How can I help you today?"
-    )
-    await message.reply(greeting)
+        pass
 
 @router.message(Command("help"))
 async def helper(message: types.Message):
@@ -797,15 +717,6 @@ async def handle_bot_specific_query(message, user_text, user_id):
             await message.reply("Sorry, I couldn't get the current time for that city/timezone. Please check the city name or try another.")
         return
     
-    # Personal Q&A
-    if any(kw in user_text for kw in ["when is my birthday", "what is my birthday", "birthday date", "my birthday", "birthday?"]):
-        bday = user_birthdays.get(str(user_id))
-        if bday:
-            await message.reply(f"Your birthday is set to {bday}. 🎂")
-        else:
-            await message.reply("I don't know your birthday yet. Please set it using /birthday DD-MM (e.g., /birthday 15-08)")
-        return
-    
     if "what is my name" in user_text or "who am i" in user_text:
         user = getattr(message, 'from_user', None)
         first_name = getattr(user, 'first_name', '')
@@ -817,28 +728,7 @@ async def handle_bot_specific_query(message, user_text, user_id):
         await message.reply(f"Your name is {full_name}.")
         return
     
-    if "what is my timezone" in user_text or "my timezone" in user_text:
-        user = getattr(message, 'from_user', None)
-        lang_code = getattr(user, 'language_code', None)
-        tz_name = get_user_timezone(user_id, lang_code)
-        if not tz_name:
-            await message.reply("I couldn't detect your timezone. Please tell me your country or city by sending: my timezone is <your city/country>")
-            return
-        dt_str, tz = await get_time_for_timezone(tz_name)
-        if dt_str:
-            await message.reply(f"Your timezone is: {tz}\nCurrent local time: {dt_str}")
-        else:
-            tz = pytz.timezone(tz_name)
-            now = datetime.now(tz)
-            await message.reply(f"Your timezone is: {tz_name}\nCurrent local time: {now.strftime('%A, %d %B %Y %H:%M:%S')}")
-        return
-    
-    if "what is my language" in user_text or "my language" in user_text:
-        user = getattr(message, 'from_user', None)
-        lang_code = getattr(user, 'language_code', None)
-        lang = get_lang(user_id)
-        await message.reply(f"Your Telegram language code is: {lang_code}\nThe bot is currently using: {lang}")
-        return
+
     
     if "what is my user id" in user_text or "my user id" in user_text:
         await message.reply(f"Your Telegram user ID is: {user_id}")
