@@ -20,6 +20,7 @@ from datetime import datetime
 import re
 from rapidfuzz import fuzz, process
 
+
 load_dotenv()
 openai.api_key = os.getenv("OPENAI_API_KEY")
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
