@@ -11,6 +11,7 @@ from geopy.geocoders import Nominatim
 from aiogram.fsm.storage.memory import MemoryStorage
 import re
 from rapidfuzz import fuzz, process
+import logging
 
 
 load_dotenv()
@@ -86,6 +87,10 @@ async def clear(message: types.Message):
     await message.reply("I've cleared the past conversation. Let's start fresh!")
 
 
+# Setup logging for debugging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
 
 # --- Update /start handler ---
 @router.message(Command("start"))
@@ -104,9 +109,9 @@ async def welcome(message: types.Message):
     # Returning user check
     if user_id in user_seen:
         await message.reply(f"Welcome back, {full_name}!")
-        
     else:
-        pass
+        user_seen.add(user_id)
+        await message.reply(f"Hello {full_name}! Welcome to the bot!")
 
 @router.message(Command("help"))
 async def helper(message: types.Message):
@@ -115,10 +120,15 @@ async def helper(message: types.Message):
         await message.reply("User not found.")
         return
     await message.reply("""
-Hi There, I'm VaradGPT Bot created by Varad Pensalwar! Please follow these commands - 
-/start - to start the conversation
-/clear - to clear the past conversation and context.
-/help - to get this help menu.
+Hi There, I'm VaradGPT created by Varad Pensalwar! Please follow these commands for quick access - 
+/start    - Start a new conversation
+/clear    - Clear conversation history and context
+/help     - Display this help menu
+/about    - Learn about Varad and background information
+/projects - View Varad's featured projects
+/resume   - Access Varad's professional resume
+/contact  - Get Varad's contact information
+/website  - Visit Varad's personal portfolio
 I hope this helps. :)
 """)
 
