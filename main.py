@@ -44,7 +44,7 @@ class Reference:
 
 
 reference = Reference()
-model_name = "gpt-4o-mini"
+model_name = "gpt-4.1-nano"
 
 
 
@@ -87,37 +87,6 @@ async def clear(message: types.Message):
         return
     clear_past()
     await message.reply("I've cleared the past conversation and context.")
-
-def get_timezone_from_lang_code(lang_code):
-    # Map common language codes to timezones
-    mapping = {
-        'en-US': 'America/New_York',
-        'en-GB': 'Europe/London',
-        'en-IN': 'Asia/Kolkata',
-        'hi-IN': 'Asia/Kolkata',
-        'mr-IN': 'Asia/Kolkata',
-        'de-DE': 'Europe/Berlin',
-        'fr-FR': 'Europe/Paris',
-        'es-ES': 'Europe/Madrid',
-        'es-MX': 'America/Mexico_City',
-        'ru-RU': 'Europe/Moscow',
-        'zh-CN': 'Asia/Shanghai',
-        'ja-JP': 'Asia/Tokyo',
-        # Add more as needed
-    }
-    if not lang_code:
-        return 'UTC'
-    # Try full code first
-    if lang_code in mapping:
-        return mapping[lang_code]
-    # Try just the country part
-    if '-' in lang_code:
-        country = lang_code.split('-')[1]
-        for code, tz in mapping.items():
-            if code.endswith(country):
-                return tz
-    return 'UTC'
-
 
 
 
@@ -263,30 +232,6 @@ Please provide a helpful, clear, and engaging response in English. Follow these 
         print(f"OpenAI error: {e}")
         return
 
-# --- User timezone storage ---
-USER_TZ_FILE = 'user_timezones.json'
-if os.path.exists(USER_TZ_FILE):
-    with open(USER_TZ_FILE, 'r') as f:
-        user_timezones = json.load(f)
-else:
-    user_timezones = {}
-
-def save_user_timezones():
-    with open(USER_TZ_FILE, 'w') as f:
-        json.dump(user_timezones, f)
-
-tzfinder = TimezoneFinder()
-
-# Helper to get user's timezone
-def get_user_timezone(user_id, lang_code=None):
-    user_id = str(user_id)
-    if user_id in user_timezones:
-        return user_timezones[user_id]
-    # Try to guess from lang_code
-    tz_name = get_timezone_from_lang_code(lang_code)
-    if tz_name == 'UTC':
-        return None
-    return tz_name
 
 # Helper to get current time and date from WorldTimeAPI
 async def get_time_for_timezone(tz_name):
@@ -727,22 +672,6 @@ async def handle_bot_specific_query(message, user_text, user_id):
     
     if "what is my user id" in user_text or "my user id" in user_text:
         await message.reply(f"Your Telegram user ID is: {user_id}")
-        return
-    
-    if "what is today" in user_text or "what day is it" in user_text:
-        user = getattr(message, 'from_user', None)
-        lang_code = getattr(user, 'language_code', None)
-        tz_name = get_user_timezone(user_id, lang_code)
-        if not tz_name:
-            await message.reply("I couldn't detect your timezone. Please tell me your country or city by sending: my timezone is <your city/country>")
-            return
-        dt_str, tz = await get_time_for_timezone(tz_name)
-        if dt_str:
-            await message.reply(f"Today is {dt_str.split()[0]}, {dt_str.split()[1]} {dt_str.split()[2]} {dt_str.split()[3]} (your timezone: {tz})")
-        else:
-            tz = pytz.timezone(tz_name)
-            now = datetime.now(tz)
-            await message.reply(f"Today is {now.strftime('%A, %d %B %Y')} (your timezone: {tz_name})")
         return
     
     if "how many times have i used" in user_text or "usage count" in user_text or "how many times" in user_text:
