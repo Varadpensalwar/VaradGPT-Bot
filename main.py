@@ -404,7 +404,7 @@ async def send_varad_qa(message: types.Message):
         answer = qa_pairs[best_q]
         # If the question is about portfolio, website, or background, append the website link if not present
         if best_q in ["portfolio", "website", "personal website", "background", "about", "bio"] and "varadpensalwar.vercel.app" not in answer:
-            answer += "\n🔗 [Website](https://varadpensalwar.vercel.app/)"
+            answer += "\n🔗 Website - https://varadpensalwar.vercel.app/"
         await message.reply(answer)
 
 # Contact Card Handler (robust, typo-tolerant, intent-based)
