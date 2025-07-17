@@ -111,7 +111,13 @@ async def welcome(message: types.Message):
         await message.reply(f"Welcome back, {full_name}!")
     else:
         user_seen.add(user_id)
-        await message.reply(f"Hello {full_name}! Welcome to the VaradGPT! How can i help you?")
+        await message.reply(f"""
+Hello {full_name}!
+Welcome to the VaradGPT!
+How can I help you?
+For quick use - /help
+""")
+
 
 @router.message(Command("help"))
 async def helper(message: types.Message):
