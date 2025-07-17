@@ -83,7 +83,7 @@ async def clear(message: types.Message):
         await message.reply("User not found.")
         return
     clear_past()
-    await message.reply("I've cleared the past conversation and context.")
+    await message.reply("I've cleared the past conversation. Let's start fresh!")
 
 
 
