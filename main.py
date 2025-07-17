@@ -150,12 +150,13 @@ async def about(message: types.Message):
         "- integrated OpenAI llm model\n"
         "- Voice message support\n"
         "- And more!\n\n"
-        "🔗 [Website](https://varadpensalwar.vercel.app/)\n"
-        "🔗 [GitHub](https://github.com/Varadpensalwar)\n"
-        "🔗 [LinkedIn](https://www.linkedin.com/in/varadpensalwar/)\n"
-        "🔗 [Twitter](https://twitter.com/PensalwarVarad)\n"
-        "✉️ Email: varadpensalwar@gmail.com\n"
-        "📱  Mobile: +91 - 8669580734"
+        "🔗 *Portfolio* - https://varadpensalwar.vercel.app/\n"
+        "💻 *GitHub* - https://github.com/Varadpensalwar\n"
+        "💼 *LinkedIn* - https://www.linkedin.com/in/varadpensalwar/\n"
+        "🐦 *Twitter* - https://twitter.com/PensalwarVarad\n"
+        "✉️ *Email* - varadpensalwar@gmail.com\n"
+        "📱  *Mobile* - +91 - 8669580734\n",
+        parse_mode="Markdown", disable_web_page_preview=True
     )
 
 @router.message(Command("project"))
