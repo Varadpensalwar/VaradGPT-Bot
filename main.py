@@ -358,7 +358,7 @@ qa_pairs = {
     "favorite open-source project": "HuggingFace Transformers.",
     "relax": "Listening to music and playing chess.",
     "github": "[Varadpensalwar](https://github.com/Varadpensalwar)",
-    "linkedin": "[linkedin.com/in/varadpensalwar](https://www.linkedin.com/in/varadpensalwar/)",
+    "linkedin": "https://www.linkedin.com/in/varadpensalwar",
     "twitter": "[@PensalwarVarad](https://twitter.com/PensalwarVarad)",
     "favorite ai application": "Conversational AI bots and creative AI tools.",
     "favorite tech in gen ai": "LangChain.",
