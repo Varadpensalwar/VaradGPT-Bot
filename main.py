@@ -559,14 +559,15 @@ async def handle_bot_specific_query(message, user_text, user_id):
 
     ]
     if any(kw in user_text for kw in creator_keywords):
-        await message.reply(
-            "I was created and maintained by Varad Pensalwar (AI/ML Engineer and GenAI Specialist).\n"
-            "🔗 [Website](https://varadpensalwar.vercel.app/)\n"
+        creator_text = (
+        "I was created and maintained by Varad Pensalwar (AI/ML Engineer and GenAI Specialist).\n"
+            "🔗 Website: https://varadpensalwar.vercel.app \n"
             "🔗 GitHub: https://github.com/Varadpensalwar\n"
-            "🔗 LinkedIn: https://www.linkedin.com/in/varadpensalwar/\n"
+            "🔗 LinkedIn: https://www.linkedin.com/in/varadpensalwar\n"
             "🔗 Twitter: https://twitter.com/PensalwarVarad"
-        )
-        return
+        
+    )
+    await message.reply(creator_text, parse_mode="Markdown")
     
 
     
