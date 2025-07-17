@@ -552,7 +552,9 @@ async def handle_bot_specific_query(message, user_text, user_id):
         "who created you", "who is the author", "who programmed you", "who is responsible for you", 
         "who is varadgpt's creator", "who is the person behind this bot", "who is the maintainer", 
         "who is the admin", "who is the mastermind", "who is the architect", "who is the engineer", 
-        "who is the builder", "who developed you"
+        "who is the builder", "who developed you", "who made?",
+        "who made?", "who build?", "who built?", "who is your creator?", "who is your developer?", "who is your founder?", "who is your owner?", "who is your maker?", "who is behind you?", "who created you?", "who is the author?", "who programmed you?", "who is responsible for you?", "who is varadgpt's creator?", "who is the person behind this bot?", "who is the maintainer?", "who is the admin?", "who is the mastermind?", "who is the architect?", "who is the engineer?", "who is the builder?", "who developed you?"
+
     ]
     if any(kw in user_text for kw in creator_keywords):
         await message.reply(
@@ -605,12 +607,10 @@ async def handle_bot_specific_query(message, user_text, user_id):
     if any(kw in user_text for kw in skills_keywords):
         await message.reply(
             "I'm Varad Pensalwar, an AI/ML Engineer and GenAI Specialist.\n"
-            "My expertise include: Bulding AI Agents that solves real life problems \n"
-            "I work with Python, R, SQL, TensorFlow, PyTorch, HuggingFace, LangChain, FastAPI, Docker, and more.\n\n"
+            "My expertise include: Developing AI Agents to Solve Real-World Problems. \n"
+            "I work with Python, SQL, LangChain, RAG and more.\n\n"
             "See my full profile and projects:\n"
-            "🔗 [GitHub](https://github.com/Varadpensalwar)\n"
-            "🔗 [LinkedIn](https://www.linkedin.com/in/varadpensalwar/)\n"
-            "🔗 [Twitter](https://twitter.com/PensalwarVarad)"
+            "🐙 GitHub - https://github.com/Varadpensalwar\n"
         )
         return
     
