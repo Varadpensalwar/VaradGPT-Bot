@@ -2,19 +2,14 @@ from dotenv import load_dotenv
 import os
 from aiogram import Bot, Dispatcher, types, Router
 import openai
-import sys
 import asyncio
 from aiogram.filters import Command
-from aiogram.types import BotCommand, InputFile, FSInputFile, BufferedInputFile
+from aiogram.types import BotCommand, FSInputFile, BufferedInputFile
 import aiohttp
-from gtts import gTTS
 import pytz
 import json
 from timezonefinder import TimezoneFinder
 from geopy.geocoders import Nominatim
-from aiohttp import web
-from aiogram.fsm.state import State, StatesGroup
-from aiogram.fsm.context import FSMContext
 from aiogram.fsm.storage.memory import MemoryStorage
 from datetime import datetime
 import re
