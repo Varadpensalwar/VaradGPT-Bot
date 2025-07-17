@@ -455,11 +455,12 @@ async def send_resume_intent(message: types.Message):
 async def send_contact(message: types.Message):
     contact_text = (
         "Here's how you can connect with Varad Pensalwar:\n\n"
-        "🔗 [Website](https://varadpensalwar.vercel.app/)\n"
-        "🔗 [GitHub](https://github.com/Varadpensalwar)\n"
-        "🔗 [LinkedIn](https://www.linkedin.com/in/varadpensalwar/)\n"
-        "🔗 [Twitter](https://twitter.com/PensalwarVarad)\n"
+        "🔗 Website - https://varadpensalwar.vercel.app \n"
+        "🐙 GitHub - https://github.com/Varadpensalwar \n"
+        "💼 LinkedIn - https://www.linkedin.com/in/varadpensalwar \n"
+        "🐦 Twitter - https://twitter.com/varadpensalwar \n"
         "✉️ Email: varadpensalwar@gmail.com\n"
+        
     )
     await message.reply(contact_text, parse_mode="Markdown")
     vcard_path = "VaradPensalwar.vcf"
@@ -469,7 +470,8 @@ async def send_contact(message: types.Message):
 @router.message(Command("website"))
 async def send_website(message: types.Message):
     await message.reply(
-        "🔗 Varad Pensalwar's personal website/portfolio:\n🔗 [Website](https://varadpensalwar.vercel.app/)",
+        "🔗 *Varad Pensalwar's* Personal Portfolio:\n" 
+        "🔗 *Website* - https://varadpensalwar.vercel.app",
         parse_mode="Markdown"
     )
 
