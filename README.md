@@ -59,9 +59,9 @@ A friendly, AI-powered Telegram bot built with Python and OpenAI GPT, featuring 
 ```text
 VaradGPT-Bot/
 ├── LICENSE
-├── main.py                    # Main bot application
-├── README.md                  # Project documentation
-├── requirements.txt           # Python dependencies
+├── main.py                   # Main bot application
+├── README.md                 # Project documentation
+├── requirements.txt          # Python dependencies
 ├── runtime.txt               # Python version specification
 ├── research/
 │   └── varadgpt_bot.py       # Research/development version
