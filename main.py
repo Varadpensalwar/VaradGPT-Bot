@@ -103,7 +103,8 @@ async def welcome(message: types.Message):
         full_name = first_name
     # Returning user check
     if user_id in user_seen:
-        welcome_line = f"Welcome back, {first_name}!"
+        await message.reply(f"Welcome back, {full_name}!")
+        
     else:
         pass
 
