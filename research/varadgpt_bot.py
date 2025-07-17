@@ -7,7 +7,7 @@ import os
 load_dotenv()
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 if not TELEGRAM_BOT_TOKEN:
-    raise RuntimeError("TELEGRAM_BOT_TOKEN must be set in environment variables.")
+    raise RuntimeError("TELEGRAM_BOT_TOKEN must be present in environment variables(.env).")
 
 #configure logging
 logging.basicConfig(level=logging.INFO)
