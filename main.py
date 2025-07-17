@@ -249,81 +249,11 @@ Please provide a helpful, clear, and engaging response in English. Follow these 
         return
 
 
-# Helper to get current time and date from WorldTimeAPI
-async def get_time_for_timezone(tz_name):
-    url = f'https://worldtimeapi.org/api/timezone/{tz_name}'
-    try:
-        async with aiohttp.ClientSession() as session:
-            async with session.get(url) as resp:
-                if resp.status == 200:
-                    data = await resp.json()
-                    # Example datetime: '2023-07-02T18:30:00.000000+05:30'
-                    dt = data.get('datetime')
-                    tz = data.get('timezone')
-                    if dt and tz:
-                        # Format: Sunday, 02 July 2023 18:30:00
-                        from datetime import datetime
-                        dt_obj = datetime.fromisoformat(dt[:-6])
-                        return dt_obj.strftime('%A, %d %B %Y %H:%M:%S'), tz
-    except Exception:
-        pass
-    return None, None
 
-# --- User city storage ---
-USER_CITY_FILE = 'user_cities.json'
-if os.path.exists(USER_CITY_FILE):
-    with open(USER_CITY_FILE, 'r') as f:
-        user_cities = json.load(f)
-else:
-    user_cities = {}
 
-def save_user_cities():
-    with open(USER_CITY_FILE, 'w') as f:
-        json.dump(user_cities, f)
 
-TIMEZONEDB_API_KEY = '9O6VYOJZWRL6'
 
-# Helper to get time from TimeZoneDB
-async def get_time_for_city(city):
-    # Try to get lat/lon from city using geopy
-    geolocator = Nominatim(user_agent="varadgpt-bot")
-    loc = await asyncio.get_event_loop().run_in_executor(None, geolocator.geocode, city)
-    if loc is not None and not asyncio.iscoroutine(loc) and hasattr(loc, 'latitude') and hasattr(loc, 'longitude'):
-        lat, lon = loc.latitude, loc.longitude
-        url = f'http://api.timezonedb.com/v2.1/get-time-zone?key={TIMEZONEDB_API_KEY}&format=json&by=position&lat={lat}&lng={lon}'
-        try:
-            async with aiohttp.ClientSession() as session:
-                async with session.get(url) as resp:
-                    if resp.status == 200:
-                        data = await resp.json()
-                        if data.get('status') == 'OK':
-                            time_str = data.get('formatted')  # e.g. '2025-07-02 18:30:00'
-                            zone_name = data.get('zoneName')
-                            gmt_offset = data.get('gmtOffset')
-                            return time_str, zone_name, gmt_offset
-        except Exception:
-            pass
-    return None, None, None
 
-# --- /setcity command handler ---
-@router.message(Command("setcity"))
-async def set_city(message: types.Message):
-    user_id = str(safe_user_id(message))
-    if not isinstance(message.text, str):
-        await message.reply("Could not read your message. Please use the format: /setcity <your city or timezone>")
-        return
-    args = message.text.split(maxsplit=1)
-    if len(args) == 2:
-        city = args[1].strip()
-        user_cities[user_id] = city
-        save_user_cities()
-        await message.reply(f"Your city/timezone has been set to: {city}")
-    else:
-        city = user_cities.get(user_id)
-        if city:
-            await message.reply(f"Your city/timezone is set to: {city}. To change it, use /setcity <your city or timezone>")
-        else:
-            await message.reply("Please set your city or timezone using: /setcity <your city or timezone>")
 
 # Move these handlers above the catch-all
 @router.message(Command("resume"))
@@ -634,44 +564,7 @@ async def handle_bot_specific_query(message, user_text, user_id):
         )
         return
     
-    # Timezone setup
-    if user_text.startswith("my timezone is "):
-        location = user_text.replace("my timezone is ", "").strip()
-        user_cities[str(user_id)] = location
-        save_user_cities()
-        await message.reply(f"Your city/timezone has been set to: {location}")
-        return
-    
-    # Time/Date queries
-    time_city_match = re.search(r'what time is it in ([\w\s,\-]+)\??', user_text)
-    date_city_match = re.search(r'what day is it in ([\w\s,\-]+)\??', user_text)
-    city = None
-    if time_city_match:
-        city = time_city_match.group(1).strip()
-    elif date_city_match:
-        city = date_city_match.group(1).strip()
-    else:
-        city = user_cities.get(str(user_id))
-    
-    if ("what is my timezone" in user_text or "my timezone" in user_text or
-        "what is today" in user_text or "what day is it" in user_text or
-        time_city_match or date_city_match):
-        if not city:
-            await message.reply("I couldn't detect your city/timezone. Please set it using /setcity <your city or timezone> or ask e.g. 'What time is it in New York?'")
-            return
-        time_str, zone_name, gmt_offset = await get_time_for_city(city)
-        if time_str:
-            if "time" in user_text:
-                await message.reply(f"The current time in {zone_name} is {time_str} (GMT offset: {gmt_offset})")
-            else:
-                if isinstance(time_str, str):
-                    date_part = time_str.split()[0]
-                    await message.reply(f"Today in {zone_name} is {date_part}")
-                else:
-                    await message.reply("Sorry, I couldn't get the date for that city/timezone.")
-        else:
-            await message.reply("Sorry, I couldn't get the current time for that city/timezone. Please check the city name or try another.")
-        return
+
     
     if "what is my name" in user_text or "who am i" in user_text:
         user = getattr(message, 'from_user', None)
@@ -712,7 +605,7 @@ async def handle_bot_specific_query(message, user_text, user_id):
     if any(kw in user_text for kw in skills_keywords):
         await message.reply(
             "I'm Varad Pensalwar, an AI/ML Engineer and GenAI Specialist.\n"
-            "My expertise includes: Machine Learning, Deep Learning (CNNs, RNNs, Transformers, GANs), Generative AI (LLMs, Diffusion Models), Computer Vision, NLP, Agentic AI, MLOps, and more.\n"
+            "My expertise include: Bulding AI Agents that solves real life problems \n"
             "I work with Python, R, SQL, TensorFlow, PyTorch, HuggingFace, LangChain, FastAPI, Docker, and more.\n\n"
             "See my full profile and projects:\n"
             "🔗 [GitHub](https://github.com/Varadpensalwar)\n"
