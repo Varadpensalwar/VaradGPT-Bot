@@ -6,12 +6,9 @@ import asyncio
 from aiogram.filters import Command
 from aiogram.types import BotCommand, FSInputFile, BufferedInputFile
 import aiohttp
-import pytz
 import json
-from timezonefinder import TimezoneFinder
 from geopy.geocoders import Nominatim
 from aiogram.fsm.storage.memory import MemoryStorage
-from datetime import datetime
 import re
 from rapidfuzz import fuzz, process
 
