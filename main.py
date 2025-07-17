@@ -141,13 +141,13 @@ I hope this helps. :)
 @router.message(Command("about"))
 async def about(message: types.Message):
     await message.reply(
-        "🤖 *About VaradGPT Bot & Owner*\n\n"
+        "🤖 About VaradGPT Bot & Owner\n\n"
         "VaradGPT is a conversational AI Telegram bot built using OpenAI's GPT models. It can answer questions, chat, and assist with various tasks.\n\n"
-        "👤 *Bot Owner*: Varad\n"
+        "👤 Bot Owner: Varad\n"
         "I am Varad, the creator and maintainer of this bot. If you have questions, feedback, or want to collaborate, feel free to reach out!\n\n"
         "Features include:\n"
-        "- Natural language conversation\n"
-        "- Birthday and timezone features\n"
+        "- get detail info about varad\n"
+        "- integrated OpenAI llm model\n"
         "- Voice message support\n"
         "- And more!\n\n"
         "🔗 [Website](https://varadpensalwar.vercel.app/)\n"
@@ -155,6 +155,7 @@ async def about(message: types.Message):
         "🔗 [LinkedIn](https://www.linkedin.com/in/varadpensalwar/)\n"
         "🔗 [Twitter](https://twitter.com/PensalwarVarad)\n"
         "✉️ Email: varadpensalwar@gmail.com\n"
+        "📱  Mobile: +91 - 8669580734"
     )
 
 @router.message(Command("project"))
