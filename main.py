@@ -731,7 +731,7 @@ async def set_bot_commands(bot: Bot):
         BotCommand(command="about", description="About VaradGPT Bot & owner"),
         BotCommand(command="project", description="Show Varad's featured projects"),
         BotCommand(command="resume", description="View Varad's resume (PDF)"),
-        BotCommand(command="contact", description="Contact Varad (links & email)"),
+        BotCommand(command="contact", description="Contact Varad (links, email & Mob.)"),
         BotCommand(command="website", description="View Varad's personal website/portfolio"),
         BotCommand(command="clear", description="Clear conversation/context"),
     ]
