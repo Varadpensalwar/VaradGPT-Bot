@@ -155,7 +155,7 @@ async def about(message: types.Message):
         "💼 *LinkedIn* - https://www.linkedin.com/in/varadpensalwar/\n"
         "🐦 *Twitter* - https://twitter.com/PensalwarVarad\n"
         "✉️ *Email* - varadpensalwar@gmail.com\n"
-        "📱  *Mobile* - +91 - 8669580734\n",
+        "📱 *Mobile* - +91 - 8669580734\n",
         parse_mode="Markdown", disable_web_page_preview=True
     )
 
