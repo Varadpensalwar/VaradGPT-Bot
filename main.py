@@ -314,7 +314,13 @@ async def chatgpt(message: types.Message):
     if user_id is None:
         await message.reply("User not found.")
         return
-       
+    
+    # Track usage count (session only)
+    user_usage_count[user_id] = user_usage_count.get(user_id, 0) + 1
+    user_text = message.text.lower() if message.text else ""
+    
+   
+    
     # If not a bot-specific query, use LLM for general questions
     await handle_general_question(message, user_id)
 
@@ -331,103 +337,9 @@ async def chatgpt(message: types.Message):
 
 
     
-    # Project info handler
-    project_keywords = ["project", "projects"]
-    context_keywords = [
-        "your", "you", "varad", "bot", "about", "show", "list", "tell", "demo", "work", "portfolio", 
-        "created", "built", "developed", "made", "feature", "featuring", "examples", "sample", 
-        "my", "our", "owner", "author", "maintainer"
-    ]
-    if any(pk in user_text for pk in project_keywords) and any(ck in user_text for ck in context_keywords):
-        await project_info(message)
-        return
     
-    # Skills/tech stack handler
-    skills_keywords = ["skills", "tech stack", "technology", "technologies", "languages", "tools", 
-                      "expertise", "specialization", "speciality", "what can you do", "what are you good at", "what do you know"]
-    if any(kw in user_text for kw in skills_keywords):
-        await message.reply(
-            "I'm Varad Pensalwar, an AI/ML Engineer and GenAI Specialist.\n"
-            "My expertise include: Developing AI Agents to Solve Real-World Problems. \n"
-            "I work with Python, SQL, LangChain, RAG and more.\n\n"
-            "See my full profile and projects:\n"
-            "🐙 GitHub - https://github.com/Varadpensalwar\n"
-        )
-        return
     
-    # Contact/social handler
-    contact_keywords = ["contact", "connect", "reach", "email", "social", "how to contact", 
-                       "how to reach", "how to connect", "get in touch"]
-    if any(kw in user_text for kw in contact_keywords):
-        await message.reply(
-            "You can connect with Varad Pensalwar here:\n"
-            "🔗 [Website](https://varadpensalwar.vercel.app/)\n"
-            "🔗 [GitHub](https://github.com/Varadpensalwar)\n"
-            "🔗 [LinkedIn](https://www.linkedin.com/in/varadpensalwar/)\n"
-            "🔗 [Twitter](https://twitter.com/PensalwarVarad)\n"
-            "Or email: varadpensalwar@gmail.com"
-        )
-        return
-    
-    # Greeting handler
-    greeting_keywords = [
-        "hi", "hello", "hey", "greetings", "good morning", "good afternoon", 
-        "good evening", "namaste", "yo", "sup"
-    ]
-    greeting_pattern = re.compile(
-        r"^\s*(" + "|".join(re.escape(greet) for greet in greeting_keywords) + r")[\s!.,]*$",
-        re.IGNORECASE
-    )
-    if greeting_pattern.match(user_text):
-        await message.reply(
-            "Hello! 👋 I'm VaradGPT Bot, your personal AI assistant.\n"
-            "You can ask me about Varad's projects, skills, or how to contact him.\n"
-            "Try commands like /about or /project, or just ask in your own words!"
-        )
-        return
-    
-    # About Varad handler
-    varad_keywords = [
-        "who is varad", "tell me about varad", "about varad", "varad pensalwar", "who is varad pensalwar", 
-        "varad's profile", "varad's bio", "varad's background", "varad's info",
-        "who are you", "who is the owner", "who is the admin", "who is the founder", "who is the mastermind", 
-        "who is the genius behind this", "who is the architect", "who is the engineer", "who is the builder", 
-        "who maintains this bot", "who runs this bot", "who is behind this bot", "who is the person behind this bot", 
-        "who is the creator of this bot", "who is the author of this bot", "who developed this bot",
-        "who is varadgpt", "varadgpt owner", "varadgpt creator", "varadgpt admin", "varadgpt author", 
-        "varadgpt maintainer", "varadgpt developer", "varadgpt founder", "varadgpt background", "varadgpt bio", "varadgpt info",
-        "who made this bot", "who built this bot", "who is responsible for this bot", "who is the genius behind varadgpt", 
-        "who is the mastermind behind varadgpt", "who is the developer of varadgpt", "who is the engineer of varadgpt", 
-        "who is the architect of varadgpt", "who is the admin of varadgpt", "who is the maintainer of varadgpt", 
-        "who is the owner of varadgpt", "who is the founder of varadgpt", "who is the creator of varadgpt"
-    ]
-    if any(kw in user_text for kw in varad_keywords):
-        await message.reply(
-            "Varad Pensalwar is an AI/ML Engineer and GenAI Specialist from Pune, India. He is passionate about building intelligent systems that transform reality. Varad is the creator and maintainer of this bot and several other AI projects.\n\n"
-            "🔗 [Website](https://varadpensalwar.vercel.app/)\n"
-            "🔗 [GitHub](https://github.com/Varadpensalwar)\n"
-            "🔗 [LinkedIn](https://www.linkedin.com/in/varadpensalwar/)\n"
-            "🔗 [Twitter](https://twitter.com/PensalwarVarad)\n"
-            "✉️ Email: varadpensalwar@gmail.com\n"
-        )
-        return
-    
-    # Resume/CV/Portfolio handler
-    resume_words = [
-        "resume", "cv", "curriculum vitae", "portfolio", "profile", "bio", "background", 
-        "experience", "education", "journey", "career", "work"
-    ]
-    context_words = [
-        "varad", "pensalwar", "your", "you", "bot", "owner", "admin", "creator", 
-        "author", "maintainer", "developer", "founder"
-    ]
-    if any(rw in user_text for rw in resume_words) and any(cw in user_text for cw in context_words):
-        await send_resume(message)
-        return
-    
-    # If none of the above, it should have been handled by LLM
-    # This should not be reached, but just in case
-    await handle_general_question(message, user_id)
+   
 
 async def handle_general_question(message, user_id):
     """Handle general questions using the LLM"""
