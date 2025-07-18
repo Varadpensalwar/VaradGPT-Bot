@@ -297,33 +297,6 @@ async def send_resume(message: types.Message):
             )
 
 
-
-# 1. Resume/CV/Portfolio Handler (add negative check for identity questions)
-@router.message(lambda m: isinstance(m.text, str) and (
-    any(fuzz.partial_ratio(word, kw) >= 85 for word in m.text.lower().split() for kw in ["resume", "cv", "curriculum vitae", "portfolio", "profile", "bio", "background", "experience", "education", "journey", "career", "work"]) and
-    any(ctx in m.text.lower() for ctx in ["varad", "pensalwar", "your", "you", "bot", "owner", "admin", "creator", "author", "maintainer", "developer", "founder", "his", "her", "their", "the owner's", "the creator's", "the admin's", "the maintainer's", "the developer's", "the founder's"]) and
-    not any(p in m.text.lower() for p in ["project", "projects"]) and
-    not any(phrase in m.text.lower() for phrase in ["who are you", "who is varad", "who am i", "who's", "who is the owner", "who is the creator"])
-))
-async def send_resume_intent(message: types.Message):
-    await send_resume(message)
-
-@router.message(Command("contact"))
-async def send_contact(message: types.Message):
-    contact_text = (
-        "Here's how you can connect with Varad Pensalwar:\n\n"
-        "🔗 Website - https://varadpensalwar.vercel.app \n"
-        "🐙 GitHub - https://github.com/Varadpensalwar \n"
-        "💼 LinkedIn - https://www.linkedin.com/in/varadpensalwar \n"
-        "🐦 Twitter - https://twitter.com/varadpensalwar \n"
-        "✉️ Email: varadpensalwar@gmail.com\n"
-        
-    )
-    await message.reply(contact_text, parse_mode="Markdown")
-    vcard_path = "VaradPensalwar.vcf"
-    if os.path.exists(vcard_path):
-        await message.answer_document(FSInputFile(vcard_path, filename='VaradPensalwar.vcf'), caption="📇 Varad Pensalwar – vCard")
-
 @router.message(Command("website"))
 async def send_website(message: types.Message):
     await message.reply(
