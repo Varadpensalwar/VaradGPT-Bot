@@ -298,50 +298,6 @@ async def send_resume(message: types.Message):
 
 
 
-
-
-
-
-
-
-
-
-
-
-# Contact Card Handler (robust, typo-tolerant, intent-based)
-def is_contact_request(m):
-    if not isinstance(m.text, str):
-        return False
-    contact_words = [
-        "contact", "email", "phone", "connect", "reach", "information", "details", "how to contact", "how to reach", "how to connect", "get in touch", "address", "social", "whatsapp", "telegram"
-    ]
-    context_words = [
-        "varad", "owner", "creator", "him", "his", "their", "pensalwar", "bot"
-    ]
-    text = m.text.lower()
-    # typo-tolerant: match if any contact word is close and any context word is present
-    if any(fuzz.partial_ratio(word, cw) >= 80 for word in text.split() for cw in contact_words) and any(ctx in text for ctx in context_words):
-        return True
-    # also match if both a contact word and a context word appear anywhere in the text
-    if any(cw in text for cw in contact_words) and any(ctx in text for ctx in context_words):
-        return True
-    return False
-
-@router.message(is_contact_request)
-async def send_contact_intent(message: types.Message):
-    contact_text = (
-        "Here's how you can connect with Varad Pensalwar:\n\n"
-        "🔗 [Website](https://varadpensalwar.vercel.app/)\n"
-        "🔗 [GitHub](https://github.com/Varadpensalwar)\n"
-        "🔗 [LinkedIn](https://www.linkedin.com/in/varadpensalwar/)\n"
-        "🔗 [Twitter](https://twitter.com/PensalwarVarad)\n"
-        "✉️ Email: varadpensalwar@gmail.com\n"
-    )
-    await message.reply(contact_text, parse_mode="Markdown")
-    vcard_path = "VaradPensalwar.vcf"
-    if os.path.exists(vcard_path):
-        await message.answer_document(FSInputFile(vcard_path, filename='VaradPensalwar.vcf'), caption="📇 Varad Pensalwar – vCard")
-
 # 1. Resume/CV/Portfolio Handler (add negative check for identity questions)
 @router.message(lambda m: isinstance(m.text, str) and (
     any(fuzz.partial_ratio(word, kw) >= 85 for word in m.text.lower().split() for kw in ["resume", "cv", "curriculum vitae", "portfolio", "profile", "bio", "background", "experience", "education", "journey", "career", "work"]) and
