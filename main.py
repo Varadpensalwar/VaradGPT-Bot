@@ -235,7 +235,8 @@ Please provide a helpful, clear, and engaging response in English. Follow these 
 - Provide specific, actionable information when possible
 - If the topic is complex, focus on the most important points
 - Use examples or analogies if they help clarify your explanation
-- Avoid unnecessary jargon or overly technical language unless specifically requested"""}
+- Avoid unnecessary jargon or overly technical language unless specifically requested
+- if you did not have latest info then do not create hypothetical or fake content, directly say sorry, i do not have enough info about this topic"""}
             ]
         )
         chatgpt_reply = response.choices[0].message.content
