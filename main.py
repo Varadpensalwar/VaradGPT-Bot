@@ -159,6 +159,22 @@ async def about(message: types.Message):
         parse_mode="Markdown", disable_web_page_preview=True
     )
 
+@router.message(Command("contact"))
+async def send_contact(message: types.Message):
+    contact_text = (
+        "Here's how you can connect with Varad Pensalwar:\n\n"
+        "🔗 Website - https://varadpensalwar.vercel.app \n"
+        "🐙 GitHub - https://github.com/Varadpensalwar \n"
+        "💼 LinkedIn - https://www.linkedin.com/in/varadpensalwar \n"
+        "🐦 Twitter - https://twitter.com/varadpensalwar \n"
+        "✉️ Email: varadpensalwar@gmail.com\n"
+        
+    )
+    await message.reply(contact_text, parse_mode="Markdown")
+    vcard_path = "VaradPensalwar.vcf"
+    if os.path.exists(vcard_path):
+        await message.answer_document(FSInputFile(vcard_path, filename='VaradPensalwar.vcf'), caption="📇 Varad Pensalwar – vCard")
+
 @router.message(Command("project"))
 async def project_info(message: types.Message):
     await message.reply(
@@ -323,23 +339,7 @@ async def chatgpt(message: types.Message):
     
     # If not a bot-specific query, use LLM for general questions
     await handle_general_question(message, user_id)
-
-    
-    
-  
-    
-
-    
-  
-    
-
-    
-
-
-    
-    
-    
-   
+ 
 
 async def handle_general_question(message, user_id):
     """Handle general questions using the LLM"""
