@@ -314,13 +314,7 @@ async def chatgpt(message: types.Message):
     if user_id is None:
         await message.reply("User not found.")
         return
-    
-    # Track usage count (session only)
-    user_usage_count[user_id] = user_usage_count.get(user_id, 0) + 1
-    user_text = message.text.lower() if message.text else ""
-    
-   
-    
+       
     # If not a bot-specific query, use LLM for general questions
     await handle_general_question(message, user_id)
 
@@ -335,11 +329,7 @@ async def chatgpt(message: types.Message):
 
     
 
-    
-    if "how many times have i used" in user_text or "usage count" in user_text or "how many times" in user_text:
-        count = user_usage_count.get(user_id, 1)
-        await message.reply(f"You have used this bot {count} times in this session.")
-        return
+
     
     # Project info handler
     project_keywords = ["project", "projects"]
