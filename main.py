@@ -302,87 +302,11 @@ async def send_resume(message: types.Message):
 
 
 
-# 4. About Varad Handler (move above Q&A handler)
-@router.message(lambda m: isinstance(m.text, str) and (
-    re.search(r'(?i)(about|abotu|abot|abou|bio|profile|background|info|details|story|journey|who is|who\'s|who are|tell me|describe|introduce|introduction|summary|summarize)', m.text) and
-    re.search(r'(?i)(varad|you|his|her|their|the owner\'s|the creator\'s|the admin\'s|the maintainer\'s|the developer\'s|the founder\'s)', m.text) and
-    not any(p in m.text.lower() for p in ["resume", "cv", "project", "projects"])
-))
-async def send_varad_info_intent(message: types.Message):
-    await message.reply(
-        "Varad Pensalwar is an AI/ML Engineer and GenAI Specialist from Pune, India. He is passionate about building intelligent systems that transform reality. Varad is the creator and maintainer of this bot and several other AI projects.\n\n"
-        "🔗 [Website](https://varadpensalwar.vercel.app/)\n"
-        "🔗 [GitHub](https://github.com/Varadpensalwar)\n"
-        "🔗 [LinkedIn](https://www.linkedin.com/in/varadpensalwar/)\n"
-        "🔗 [Twitter](https://twitter.com/PensalwarVarad)\n"
-        "✉️ Email: varadpensalwar@gmail.com\n"
-    )
 
-# 5. Q&A About Varad Handler (typo-tolerant, intent-based)
-qa_pairs = {
-    "favorite programming language": "Python!",
-    "what inspires": "Building things that help people, AI progress, and curiosity.",
-    "hobbies": "Chess, Coding, reading, exploring AI, music, and travel.",
-    "mission": "To push the boundaries of AI and make technology accessible and helpful for everyone.",
-    "where are you from": "Pune, Maharashtra, India 🇮🇳",
-    "educational background": "B.Tech in Artificial Intelligence & Machine Learning from Sanjay Ghodawat University, Kolhapur.",
-    "favorite ai technology": "Large Language Models (LLMs) and Generative AI!",
-    "dream project": "Building an AI assistant that can truly understand and help people in their daily lives.",
-    "favorite book": "Learning LangChain: Building AI and LLM Applications with LangChain and LangGraph by Mayo Oshin & Nuno Campos.",
-    "favorite quote": "The future belongs to those who understand AI.",
-    "favorite chess opening": "The Queen's Gambit!",
-    "programming languages": "Python, SQL, and a bit of JavaScript.",
-    "favorite open-source project": "HuggingFace Transformers.",
-    "relax": "Listening to music and playing chess.",
-    "github": "[Varadpensalwar](https://github.com/Varadpensalwar)",
-    "linkedin": "https://www.linkedin.com/in/varadpensalwar",
-    "twitter": "[@PensalwarVarad](https://twitter.com/PensalwarVarad)",
-    "favorite ai application": "Conversational AI bots and creative AI tools.",
-    "favorite tech in gen ai": "LangChain.",
-    "favorite sport": "Chess!",
-    "favorite food": "Indian cuisine, especially paneer dishes.",
-    "favorite place": "Sydney, Australia.",
-    "favorite music genre": "Classical and instrumental.",
-    "long-term goal": "To lead impactful AI projects and contribute to the global AI community.",
-    "favorite movie": "My favorite movie is Bloody Daddy!",
-    "favorite programming framework": "I love working with FastAPI for building modern web APIs.",
-    "favorite ide or code editor": "My go-to code editor is VS Code for its versatility and extensions.",
-    "favorite holiday destination": "Sydney, Australia is my favorite holiday destination!",
-    "favorite startup or tech company": "I admire Google and Atlassian for their innovation and impact.",
-    "favorite productivity tool": "Notion and Cursor are my favorite productivity tools for organizing work and ideas.",
-    "favorite youtube channel or podcast": "I enjoy learning from Code With Harry on YouTube.",
-    "favorite color": "Orange is my favorite color—it's vibrant and energetic!",
-    "favorite animal": "The tiger is my favorite animal, symbolizing strength and courage.",
-    "favorite subject in school": "Math was always my favorite subject.",
-    "favorite way to learn new things": "I love learning from official documentation—it's the most reliable source!",
-    "favorite ai use case": "I love using AI for solving bugs and making development smoother.",
-    "favorite thing about being an ai/ml engineer": "Watching code transform raw data into intelligent insights that nobody has ever seen before is the best part of being an AI/ML engineer.",
-    "website": "🔗 [Website](https://varadpensalwar.vercel.app/)",
-    "portfolio": "You can explore my portfolio and learn more about me at 🔗 [Website](https://varadpensalwar.vercel.app/)",
-    "personal website": "My personal website is 🔗 [Website](https://varadpensalwar.vercel.app/)",
-}
 
-def is_varad_qa_question(m):
-    if not isinstance(m.text, str):
-        return False
-    # Exclude generic identity questions
-    identity_phrases = ["who are you", "who is varad", "who am i", "who's", "who is the owner", "who is the creator"]
-    if any(phrase in m.text.lower() for phrase in identity_phrases):
-        return False
-    return any(fuzz.partial_ratio(m.text.lower(), q) >= 80 for q in qa_pairs.keys())
 
-@router.message(is_varad_qa_question)
-async def send_varad_qa(message: types.Message):
-    # Find the best match
-    if not isinstance(message.text, str):
-        return
-    best_q, score, _ = process.extractOne(message.text.lower(), qa_pairs.keys(), scorer=fuzz.partial_ratio)
-    if score >= 80:
-        answer = qa_pairs[best_q]
-        # If the question is about portfolio, website, or background, append the website link if not present
-        if best_q in ["portfolio", "website", "personal website", "background", "about", "bio"] and "varadpensalwar.vercel.app" not in answer:
-            answer += "\n🔗 Website - https://varadpensalwar.vercel.app/"
-        await message.reply(answer)
+
+
 
 # Contact Card Handler (robust, typo-tolerant, intent-based)
 def is_contact_request(m):
