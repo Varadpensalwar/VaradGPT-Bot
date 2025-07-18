@@ -319,106 +319,22 @@ async def chatgpt(message: types.Message):
     user_usage_count[user_id] = user_usage_count.get(user_id, 0) + 1
     user_text = message.text.lower() if message.text else ""
     
-    # Check if this is a bot-specific query first
-    if is_bot_specific_query(user_text):
-        await handle_bot_specific_query(message, user_text, user_id)
-        return
+   
     
     # If not a bot-specific query, use LLM for general questions
     await handle_general_question(message, user_id)
 
-def is_bot_specific_query(user_text):
-    """Check if the query is specifically about the bot, Varad, or bot features"""
     
-    # Bot-specific keywords
-    bot_keywords = [
-        # Varad/owner related
-        "varad", "pensalwar", "owner", "creator", "developer", "founder", "admin", "maintainer",
-        "who made", "who built", "who created", "who developed", "who is behind",
-        
-        # Bot features
-        "my birthday", "my timezone", "my name", "my user id", "my language", "usage count",
-        "what is my", "when is my", "how many times",
-        
-        # Commands and features
-        "resume", "cv", "portfolio", "contact", "website", "project", "projects",
-        "skills", "tech stack", "expertise", "about varad", "about you",
-        
-        # Greetings
-        "hi", "hello", "hey", "greetings", "good morning", "good afternoon", "good evening", "namaste", "yo", "sup",
-        
-        # Time/date queries (bot handles these)
-        "what time", "current time", "time is it", "what date", "current date", "date is it", "today", "day is it",
-        "my timezone is"
-    ]
     
-    return any(keyword in user_text for keyword in bot_keywords)
-
-async def handle_bot_specific_query(message, user_text, user_id):
-    """Handle queries specifically about the bot, Varad, or bot features"""
-    
-    # Resume/CV/Portfolio handlers
-    resume_keywords = [
-        "resume", "cv", "curriculum vitae", "portfolio", "profile", "bio", "background",
-        "experience", "education", "journey", "career", "work"
-    ]
-    context_keywords = [
-        "varad", "pensalwar", "your", "you", "bot", "owner", "admin", "creator",
-        "author", "maintainer", "developer", "founder"
-    ]
-    
-    def fuzzy_in(text, keywords, threshold=85):
-        return any(fuzz.partial_ratio(text, kw) >= threshold for kw in keywords)
-    
-    user_text_words = user_text.split()
-    for word in user_text_words:
-        if fuzzy_in(word, resume_keywords) and any(ctx in user_text for ctx in context_keywords):
-            await send_resume(message)
-            return
-        if fuzzy_in(word, context_keywords) and any(rk in user_text for rk in resume_keywords):
-            await send_resume(message)
-            return
-    
-    # Creator/owner handler
-    creator_keywords = [
-        "who made", "who build", "who built", "who is your creator", "who is your developer", 
-        "who is your founder", "who is your owner", "who is your maker", "who is behind you", 
-        "who created you", "who is the author", "who programmed you", "who is responsible for you", 
-        "who is varadgpt's creator", "who is the person behind this bot", "who is the maintainer", 
-        "who is the admin", "who is the mastermind", "who is the architect", "who is the engineer", 
-        "who is the builder", "who developed you", "who made?",
-        "who made?", "who build?", "who built?", "who is your creator?", "who is your developer?", "who is your founder?", "who is your owner?", "who is your maker?", "who is behind you?", "who created you?", "who is the author?", "who programmed you?", "who is responsible for you?", "who is varadgpt's creator?", "who is the person behind this bot?", "who is the maintainer?", "who is the admin?", "who is the mastermind?", "who is the architect?", "who is the engineer?", "who is the builder?", "who developed you?"
-
-    ]
-    if any(kw in user_text for kw in creator_keywords):
-        creator_text = (
-        "I was created and maintained by Varad Pensalwar (AI/ML Engineer and GenAI Specialist).\n"
-            "🔗 Website: https://varadpensalwar.vercel.app \n"
-            "🔗 GitHub: https://github.com/Varadpensalwar\n"
-            "🔗 LinkedIn: https://www.linkedin.com/in/varadpensalwar\n"
-            "🔗 Twitter: https://twitter.com/PensalwarVarad"
-        
-    )
-    await message.reply(creator_text, parse_mode="Markdown")
+  
     
 
     
-    if "what is my name" in user_text or "who am i" in user_text:
-        user = getattr(message, 'from_user', None)
-        first_name = getattr(user, 'first_name', '')
-        last_name = getattr(user, 'last_name', '')
-        if last_name:
-            full_name = f"{first_name} {last_name}"
-        else:
-            full_name = first_name
-        await message.reply(f"Your name is {full_name}.")
-        return
+  
     
 
     
-    if "what is my user id" in user_text or "my user id" in user_text:
-        await message.reply(f"Your Telegram user ID is: {user_id}")
-        return
+
     
     if "how many times have i used" in user_text or "usage count" in user_text or "how many times" in user_text:
         count = user_usage_count.get(user_id, 1)
