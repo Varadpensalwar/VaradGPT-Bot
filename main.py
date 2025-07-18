@@ -296,34 +296,11 @@ async def send_resume(message: types.Message):
                 caption="📄 Varad Pensalwar – Resume"
             )
 
-@router.message(Command("cv"))
-async def send_cv(message: types.Message):
-    await send_resume(message)
 
-# Add a regex-based handler for /resume and /cv with extra words
-@router.message(lambda m: isinstance(m.text, str) and re.match(r"^/(resume|cv)\b", m.text.lower()))
-async def send_resume_regex(message: types.Message):
-    await send_resume(message)
 
-# Ultra-flexible resume/cv/portfolio handler (natural language, regex-based)
-@router.message(lambda m: isinstance(m.text, str) and re.search(
-    r'(?i)(/)?(resume|resumé|cv|curricul[au]m vitae|portfolio|portfolyo|profile|bio|background|experience|education|journey|career|work)[^a-z]*'
-    r'(varad|pensalwar|your|you|bot|owner|admin|creator|author|maintainer|developer|founder)?', m.text))
-async def send_resume_natural(message: types.Message):
-    await send_resume(message)
 
-# Ultra-flexible owner/creator/admin handler (regex-based)
-@router.message(lambda m: isinstance(m.text, str) and re.search(
-    r'(?i)(who (is )?(the )?(owner|creator|maker|admin|author|maintainer|developer|founder|builder|created|built|make|made)|owner|creator|maker|admin|author|maintainer|developer|founder|built|made|make|created)( of (this|the|varadgpt|bot|project|service|assistant|application|code|software|platform|system|solution|product|tool))?', m.text))
-async def send_owner_info(message: types.Message):
-    await message.reply(
-        "Varad Pensalwar is the owner, creator, and maintainer of this bot and several other AI projects.\n\n"
-        "🔗 [Website](https://varadpensalwar.vercel.app/)\n"
-        "🔗 [GitHub](https://github.com/Varadpensalwar)\n"
-        "🔗 [LinkedIn](https://www.linkedin.com/in/varadpensalwar/)\n"
-        "🔗 [Twitter](https://twitter.com/PensalwarVarad)\n"
-        "✉️ Email: varadpensalwar@gmail.com\n"
-    )
+
+
 
 # 4. About Varad Handler (move above Q&A handler)
 @router.message(lambda m: isinstance(m.text, str) and (
