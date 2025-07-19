@@ -4,7 +4,7 @@
 ![License](https://img.shields.io/github/license/Varadpensalwar/VaradGPT-Bot)
 ![Last Commit](https://img.shields.io/github/last-commit/Varadpensalwar/VaradGPT-Bot)
 
-A friendly, AI-powered Telegram bot built with Python and OpenAI GPT, featuring voice message transcription, birthday reminders, and festive greetings.
+An AI-powered Telegram bot built with Python and OpenAI GPT, featuring voice message transcription, birthday reminders, and festive greetings.
 
 ---
 
