@@ -1,4 +1,4 @@
-# VaradGPT Bot 🤖.
+# VaradGPT Bot 🤖
 
 ![Python](https://img.shields.io/badge/python-3.12%2B-blue)
 ![License](https://img.shields.io/github/license/Varadpensalwar/VaradGPT-Bot)
