@@ -1,8 +1,9 @@
 # VaradGPT Bot 🤖
 
 ![Python](https://img.shields.io/badge/python-3.12%2B-blue)
-<!-- ![License](https://img.shields.io/github/license/Varadpensalwar/VaradGPT-Bot) -->
 ![Last Commit](https://img.shields.io/github/last-commit/Varadpensalwar/VaradGPT-Bot)
+<!-- ![License](https://img.shields.io/github/license/Varadpensalwar/VaradGPT-Bot) -->
+
 
 An AI-powered Telegram bot built with Python and OpenAI GPT, featuring voice message transcription.
 
