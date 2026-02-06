@@ -34,8 +34,7 @@ An AI-powered Telegram bot built with Python and OpenAI GPT, featuring voice mes
 
 - **Conversational AI**: Powered by OpenAI GPT for natural, context-aware chat.
 - **Voice Message Transcription**: Converts Telegram voice messages to text using OpenAI Whisper.
-- **Birthday Reminders**: Users can set and be greeted on their birthday.
-- **Festive Greetings**: Sends special greetings on holidays and festivals.
+
 
 ---
 
