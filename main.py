@@ -281,6 +281,7 @@ async def send_website(message: types.Message):
         "🔗 *Website* - https://varadpensalwar.vercel.app",
         parse_mode="Markdown"
     )
+# General message handler for all other messages (non-commands)
 @router.message()
 async def chatgpt(message: types.Message):
     user_id = safe_user_id(message)
