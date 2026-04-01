@@ -45,11 +45,7 @@ An AI-powered Telegram bot built with Python and OpenAI GPT, featuring voice mes
 - **Frameworks/Libraries**:
   - [aiogram](https://docs.aiogram.dev/) (Telegram Bot API)
   - [openai](https://github.com/openai/openai-python) (ChatGPT/Whisper)
-  - [gtts](https://pypi.org/project/gTTS/) (Text-to-Speech)
   - [python-dotenv](https://pypi.org/project/python-dotenv/) (Env management)
-  - [pytz](https://pypi.org/project/pytz/) (Timezone support)
-  - [timezonefinder](https://pypi.org/project/timezonefinder/) (City to timezone)
-  - [geopy](https://pypi.org/project/geopy/) (Geocoding)
   - [aiohttp](https://docs.aiohttp.org/) (Async HTTP)
 
 ---
@@ -63,10 +59,8 @@ VaradGPT-Bot/
 ├── README.md                 # Project documentation
 ├── requirements.txt          # Python dependencies
 ├── runtime.txt               # Python version specification
-├── research/
-│   └── varadgpt_bot.py       # Research/development version
 ├── Demo.mp4                  # Demo video
-├── Varad Resume.pdf          # Resume file
+├── Varad_Pensalwar_Resume.pdf # Resume file
 ├── VaradPensalwar.vcf        # Contact card
 ```
 

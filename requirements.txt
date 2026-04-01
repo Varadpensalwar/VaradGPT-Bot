@@ -1,14 +1,4 @@
 aiogram
 openai>=1.0.0
 python-dotenv
-pytz
-timezonefinder
-geopy
-Babel
-gspread
-gtts
-google-auth
-google-auth-oauthlib
 aiohttp
-requests
-rapidfuzz

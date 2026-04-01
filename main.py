@@ -7,13 +7,11 @@ from aiogram.filters import Command
 from aiogram.types import BotCommand, FSInputFile, BufferedInputFile
 import aiohttp
 from aiogram.fsm.storage.memory import MemoryStorage
-import logging
 
 
 load_dotenv()
 openai.api_key = os.getenv("OPENAI_API_KEY")
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
-print("DEBUG: openai.api_key =", openai.api_key, "TELEGRAM_BOT_TOKEN =", TELEGRAM_BOT_TOKEN)
 if not openai.api_key or not TELEGRAM_BOT_TOKEN:
     raise RuntimeError("OPENAI_API_KEY and TELEGRAM_BOT_TOKEN must be set in environment variables.")
 
@@ -23,8 +21,7 @@ client = openai.OpenAI(api_key=openai.api_key)
 # Safe getters (moved to top to avoid undefined errors)
 def safe_user_id(message):
     return getattr(getattr(message, 'from_user', None), 'id', None)
-def safe_full_name(message):
-    return getattr(getattr(message, 'from_user', None), 'full_name', "Unknown")
+
 
 
 class Reference:
@@ -56,14 +53,8 @@ def clear_past():
     reference.response = ""
 
 
-
-# In-memory user language store
 user_seen = set()
 
-# Add at the top, after user_seen = set()
-user_usage_count = {}
-
-# Update all other handlers to use the selected language
 @router.message(Command("clear"))
 async def clear(message: types.Message):
     user_id = safe_user_id(message)
@@ -72,14 +63,6 @@ async def clear(message: types.Message):
         return
     clear_past()
     await message.reply("I've cleared the past conversation. Let's start fresh!")
-
-
-# Setup logging for debugging
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
-
-
-# --- Update /start handler ---
 @router.message(Command("start"))
 async def welcome(message: types.Message):
     user_id = safe_user_id(message)
@@ -207,7 +190,6 @@ async def handle_voice(message: types.Message):
             with open(ogg_path, 'wb') as f:
                 f.write(await resp.read())
     # Transcribe using OpenAI Whisper
-    transcription = None
     try:
         with open(ogg_path, 'rb') as audio_file:
             transcript_resp = client.audio.transcriptions.create(
@@ -215,7 +197,7 @@ async def handle_voice(message: types.Message):
                 file=audio_file
             )
             transcription = transcript_resp.text
-    except Exception as e:
+    except Exception:
         await message.reply("Sorry, I couldn't transcribe your voice message.")
         os.remove(ogg_path)
         return
@@ -252,18 +234,8 @@ Please provide a helpful, clear, and engaging response in English. Follow these 
         await message.reply("Sorry, I couldn't get a response from ChatGPT.")
         print(f"OpenAI error: {e}")
         return
-
-
-
-
-
-
-
-
-# Move these handlers above the catch-all
 @router.message(Command("resume"))
 async def send_resume(message: types.Message):
-    import os
     summary = (
         "*Varad Pensalwar – Resume Summary*\n\n"
         "🎓 *Education*: B.Tech in Artificial Intelligence & Machine Learning, Sanjay Ghodawat University, Kolhapur\n"
@@ -309,23 +281,15 @@ async def send_website(message: types.Message):
         "🔗 *Website* - https://varadpensalwar.vercel.app",
         parse_mode="Markdown"
     )
-
-# Ensure the catch-all handler remains at the end
 @router.message()
 async def chatgpt(message: types.Message):
     user_id = safe_user_id(message)
     if user_id is None:
         await message.reply("User not found.")
         return
-    
-    # Track usage count (session only)
-    user_usage_count[user_id] = user_usage_count.get(user_id, 0) + 1
-    
-   
-    
-    # If not a bot-specific query, use LLM for general questions
+
     await handle_general_question(message)
- 
+
 
 async def handle_general_question(message):
     """Handle general questions using the LLM"""
@@ -359,7 +323,6 @@ async def on_startup(dispatcher: Dispatcher):
     dispatcher.include_router(router)
     await set_bot_commands(bot)
 
-# Remove /groupinfo from the bot command menu
 async def set_bot_commands(bot: Bot):
     commands = [
         BotCommand(command="start", description="Start the conversation"),
@@ -378,4 +341,3 @@ if __name__ == "__main__":
         await on_startup(dispatcher)
         await dispatcher.start_polling(bot)
     asyncio.run(main())
-
