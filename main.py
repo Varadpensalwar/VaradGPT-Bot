@@ -58,19 +58,10 @@ def clear_past():
 
 
 # In-memory user language store
-user_languages = {}
-
-# At the top of the file, after user_languages = {}
 user_seen = set()
 
 # Add at the top, after user_seen = set()
 user_usage_count = {}
-
-# Helper to get user's language, always returns 'en' if user_id is None or not a string
-def get_lang(user_id):
-    if not isinstance(user_id, str) and not isinstance(user_id, int):
-        return 'en'
-    return user_languages.get(user_id, 'en')
 
 # Update all other handlers to use the selected language
 @router.message(Command("clear"))
@@ -329,12 +320,11 @@ async def chatgpt(message: types.Message):
     
     # Track usage count (session only)
     user_usage_count[user_id] = user_usage_count.get(user_id, 0) + 1
-    user_text = message.text.lower() if message.text else ""
     
    
     
     # If not a bot-specific query, use LLM for general questions
-    await handle_general_question(message, user_id)
+    await handle_general_question(message)
  
 
 async def handle_general_question(message):
@@ -388,5 +378,4 @@ if __name__ == "__main__":
         await on_startup(dispatcher)
         await dispatcher.start_polling(bot)
     asyncio.run(main())
-
 
