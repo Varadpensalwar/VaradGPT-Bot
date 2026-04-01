@@ -164,9 +164,8 @@ async def project_info(message: types.Message):
         , parse_mode="Markdown", disable_web_page_preview=True
     )
 
-@router.message(Command("projects"))
-async def projects_info(message: types.Message):
-    await project_info(message)
+
+
 
 @router.message(lambda m: m.voice is not None)
 async def handle_voice(message: types.Message):
