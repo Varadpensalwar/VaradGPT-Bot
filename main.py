@@ -6,11 +6,7 @@ import asyncio
 from aiogram.filters import Command
 from aiogram.types import BotCommand, FSInputFile, BufferedInputFile
 import aiohttp
-import json
-from geopy.geocoders import Nominatim
 from aiogram.fsm.storage.memory import MemoryStorage
-import re
-from rapidfuzz import fuzz, process
 import logging
 
 
