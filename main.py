@@ -337,7 +337,7 @@ async def chatgpt(message: types.Message):
     await handle_general_question(message, user_id)
  
 
-async def handle_general_question(message, user_id):
+async def handle_general_question(message):
     """Handle general questions using the LLM"""
     prev_response = reference.response if reference.response else ""
     safe_text = message.text if isinstance(message.text, str) else ""
