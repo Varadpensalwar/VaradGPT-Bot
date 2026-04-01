@@ -23,18 +23,7 @@ def safe_user_id(message):
     return getattr(getattr(message, 'from_user', None), 'id', None)
 
 
-
-class Reference:
-    '''
-    A class to store previously response from the openai API
-    '''
-
-    def __init__(self) -> None:
-        self.response = ""
-
-
-
-reference = Reference()
+user_context = {}
 model_name = "gpt-4.1-nano"
 
 
@@ -47,10 +36,9 @@ router = Router()
 
 
 
-def clear_past():
-    """A function to clear the previous conversation and context.
-    """
-    reference.response = ""
+def clear_past(user_id):
+    """Clear the saved context for one user."""
+    user_context.pop(user_id, None)
 
 
 user_seen = set()
@@ -61,7 +49,7 @@ async def clear(message: types.Message):
     if user_id is None:
         await message.reply("User not found.")
         return
-    clear_past()
+    clear_past(user_id)
     await message.reply("I've cleared the past conversation. Let's start fresh!")
 @router.message(Command("start"))
 async def welcome(message: types.Message):
@@ -203,7 +191,7 @@ async def handle_voice(message: types.Message):
     os.remove(ogg_path)
     await message.reply(f"Transcription: {transcription}")
     # Send transcription to ChatGPT
-    prev_response = reference.response if reference.response else ""
+    prev_response = user_context.get(user_id, "")
     try:
         safe_text = transcription if isinstance(transcription, str) else ""
         response = client.chat.completions.create(
@@ -226,9 +214,9 @@ Please provide a helpful, clear, and engaging response in English. Follow these 
         )
         chatgpt_reply = response.choices[0].message.content
         if chatgpt_reply:
-            reference.response = chatgpt_reply
-        print(f">>> chatGPT: \n\t{reference.response}")
-        await bot.send_message(chat_id = message.chat.id, text = reference.response)
+            user_context[user_id] = chatgpt_reply
+        print(f">>> chatGPT: \n\t{user_context.get(user_id, '')}")
+        await bot.send_message(chat_id=message.chat.id, text=user_context.get(user_id, ""))
     except Exception as e:
         await message.reply("Sorry, I couldn't get a response from ChatGPT.")
         print(f"OpenAI error: {e}")
@@ -293,7 +281,12 @@ async def chatgpt(message: types.Message):
 
 async def handle_general_question(message):
     """Handle general questions using the LLM"""
-    prev_response = reference.response if reference.response else ""
+    user_id = safe_user_id(message)
+    if user_id is None:
+        await message.reply("User not found.")
+        return
+
+    prev_response = user_context.get(user_id, "")
     safe_text = message.text if isinstance(message.text, str) else ""
     
     if not safe_text.strip():
@@ -310,9 +303,9 @@ async def handle_general_question(message):
         )
         chatgpt_reply = response.choices[0].message.content
         if chatgpt_reply:
-            reference.response = chatgpt_reply
-        print(f">>> chatGPT: \n\t{reference.response}")
-        await bot.send_message(chat_id = message.chat.id, text = reference.response)
+            user_context[user_id] = chatgpt_reply
+        print(f">>> chatGPT: \n\t{user_context.get(user_id, '')}")
+        await bot.send_message(chat_id=message.chat.id, text=user_context.get(user_id, ""))
     except Exception as e:
         await message.reply("Sorry, I couldn't get a response from ChatGPT.")
         print(f"OpenAI error: {e}")
