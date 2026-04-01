@@ -68,8 +68,6 @@ VaradGPT-Bot/
 ├── Demo.mp4                  # Demo video
 ├── Varad Resume.pdf          # Resume file
 ├── VaradPensalwar.vcf        # Contact card
-└── varadgptbot/              # Virtual environment (created during setup)
-    └── (virtual environment files)
 ```
 
 ---
