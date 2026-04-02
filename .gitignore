@@ -43,7 +43,6 @@ gmail_tokens.json
 # User data
 user_timezones.json
 user_cities.json
-birthdays.json
 
 # Misc
 *.bak
