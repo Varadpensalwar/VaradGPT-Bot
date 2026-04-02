@@ -41,7 +41,7 @@ An AI-powered Telegram bot built with Python and OpenAI GPT, featuring voice mes
 
 ## 🛠️ Tech Stack
 
-- **Backend**: Python 3.12+
+- **Backend**: Python 3.11
 - **Frameworks/Libraries**:
   - [aiogram](https://docs.aiogram.dev/) (Telegram Bot API)
   - [openai](https://github.com/openai/openai-python) (ChatGPT/Whisper)
