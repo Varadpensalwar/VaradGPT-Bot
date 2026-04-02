@@ -69,7 +69,7 @@ VaradGPT-Bot/
 ## ⚙️ Installation & Setup
 
 ### **Prerequisites**
-- Python 3.12+
+- Python 3.11
 - Telegram account (to create a bot via [BotFather](https://core.telegram.org/bots#botfather))
 - OpenAI account & API key
 
