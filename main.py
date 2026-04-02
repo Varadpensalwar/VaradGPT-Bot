@@ -147,7 +147,7 @@ async def project_info(message: types.Message):
         "HealthAI-Assistant is a medical chatbot that leverages AI to provide health-related information based on medical literature. The application uses a Retrieval-Augmented Generation (RAG) approach to answer user queries by referencing a medical knowledge base.\n"
         "[GitHub](https://github.com/Varadpensalwar/HealthAI-Assistant.git) | [Demo](https://drive.google.com/file/d/1MyUsry_0wvEu-DcefOTXk-ZXc_rUrHoW/view)\n\n"
         "*VaradGPT Bot*\n"
-        "VaradGPT Bot is a friendly, AI-powered Telegram bot built with Python and OpenAI GPT, offering natural conversational AI, voice message transcription, birthday reminders, and festive greetings. Designed for seamless interaction, it leverages aiogram, OpenAI APIs, and other modern Python libraries to deliver a rich chat experience.\n"
+        "VaradGPT Bot is a friendly, AI-powered Telegram bot built with Python and OpenAI GPT, offering natural conversational AI, voice message transcription. Designed for seamless interaction, it leverages aiogram, OpenAI APIs, and other modern Python libraries to deliver a rich chat experience.\n"
         "[GitHub](https://github.com/Varadpensalwar/VaradGPT-Bot) | [Try on Telegram](https://t.me/VaradGPTBot)\n\n"
         , parse_mode="Markdown", disable_web_page_preview=True
     )
